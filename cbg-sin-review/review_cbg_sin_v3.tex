@@ -1,0 +1,1304 @@
+% ===========================================================================
+% 氮化硅波导啁啾布拉格光栅：色散补偿与集成锁模激光器
+% 综合综述论文 v3
+% 覆盖范围：1987--2026（近四十年），40+篇核心文献
+% ===========================================================================
+\documentclass[12pt,a4paper,twoside]{article}
+
+% ---- 中文支持 ----
+\usepackage[UTF8]{ctex}
+\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKsansfont{SimHei}
+\setCJKmonofont{FangSong}
+
+% ---- 页面布局 ----
+\usepackage[margin=2.2cm, bottom=2.5cm, top=2.5cm]{geometry}
+
+% ---- 超链接 ----
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
+
+% ---- 表格 ----
+\usepackage{longtable,booktabs,array,multirow,makecell,tabularx,threeparttable}
+
+% ---- 数学 ----
+\usepackage{amsmath,amssymb,physics,siunitx}
+
+% ---- 图片 ----
+\usepackage{graphicx,subcaption}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc,patterns,decorations.pathmorphing,
+                decorations.markings,backgrounds,fit,shadows,3d,matrix,
+                chains,scopes,mindmap,trees,decorations.pathreplacing,
+                shapes.geometric,shapes.multipart,arrows.meta}
+
+% ---- 参考文献 ----
+\usepackage[sort&compress,numbers]{natbib}
+
+% ---- 页眉页脚 ----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LO]{\small\rightmark}
+\fancyhead[RE]{\small\leftmark}
+\fancyhead[RO,LE]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---- 章节标题格式 ----
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+
+% ---- 其他 ----
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
+
+% ---- TikZ 颜色定义 ----
+\definecolor{sinblue}{RGB}{65,105,180}
+\definecolor{sio2gray}{RGB}{180,180,180}
+\definecolor{gratingred}{RGB}{200,50,50}
+\definecolor{gainpurple}{RGB}{128,0,128}
+
+% ===========================================================================
+\begin{document}
+
+% ---- 标题页 ----
+\title{
+  {\Huge \textbf{氮化硅波导啁啾布拉格光栅}}\\[6pt]
+  {\Large ——色散补偿、脉冲压缩与集成锁模激光器——}\\[16pt]
+  {\large Chirped Bragg Gratings on Silicon Nitride Waveguides:}\\[3pt]
+  {\large Dispersion Compensation, Pulse Compression, and Integrated}\\[3pt]
+  {\large Mode-Locked Lasers}\\[20pt]
+  {\normalsize 综\quad 述}
+}
+\author{}
+\date{\today}
+\maketitle
+
+\begin{abstract}
+\noindent
+片上色散管理是集成光子学的核心挑战之一。啁啾布拉格光栅（Chirped Bragg Grating, CBG）
+通过在光传播方向引入渐变的布拉格周期，使不同波长的光在光栅的不同位置被反射，
+从而在宽带范围内提供可控的群延迟色散。氮化硅（Si$_3$N$_4$）平台凭借超低传播损耗
+（$\sim$\SI{0.05}{dB/cm}）、CMOS兼容性和无双光子吸收等独特优势，
+已成为实现高性能片上啁啾布拉格光栅的首选材料。
+
+本文系统综述了1987年至2026年间氮化硅波导啁啾布拉格光栅的研究进展，覆盖40余篇核心文献。
+首先回顾了啁啾布拉格光栅的理论基础，从经典的耦合模理论到适用于高折射率差集成波导的
+有效折射率传输矩阵法。其次，详尽梳理了片上色散补偿的发展脉络——从厘米级螺旋光栅的
+首创（2020年，1440~ps群延迟，$-$156.5~ps/nm色散），到群延迟记录不断刷新
+（2023年，2864~ps，65.87~ns$\cdot$nm延迟-带宽积），再到超宽带脉冲压缩的突破
+（2025年，164~nm带宽，62~fs脉冲压缩）。随后，介绍了啁啾多模波导光栅
+（CMWG）的正/负色散数字可调谐方案（$\pm$63.77~ps/nm）和TM型色散补偿器的
+工艺鲁棒设计。此外，综述了SiN切趾啁啾光栅在集成锁模激光器中的色散管理应用
+及III-V/SiN异质集成方案。最后，总结了逆向耦合器、亚波长光栅啁啾结构、
+可重构布拉格光栅等衍生技术，并展望了未来发展方向。
+
+\textbf{关键词：} 啁啾布拉格光栅；氮化硅波导；色散补偿；锁模激光器；
+集成光子学；耦合模理论；传输矩阵法；脉冲压缩；逆向耦合器
+
+\vspace{10pt}
+\hrule
+\vspace{8pt}
+
+\noindent\textbf{Abstract:}
+On-chip dispersion management is a fundamental challenge in integrated photonics.
+Chirped Bragg gratings (CBGs) provide controllable group-delay dispersion over
+broad bandwidths through a gradually varying grating period along the propagation
+direction. The silicon nitride (Si$_3$N$_4$) platform, with its ultra-low
+propagation loss ($\sim$\SI{0.05}{dB/cm}), CMOS compatibility, and negligible
+two-photon absorption, has emerged as the premier material for high-performance
+on-chip CBGs.
+
+This paper presents a comprehensive review of SiN waveguide chirped Bragg gratings
+from 1987 to 2026, covering over 40 key publications. We begin with the theoretical
+foundations of CBGs, from classical coupled-mode theory to the effective-refractive-index
+transfer-matrix method suitable for high-index-contrast waveguides. We then
+chronologically trace the advances in on-chip dispersion compensation: from the
+first centimeter-scale spiral grating (2020, 1440~ps group delay, $-$156.5~ps/nm
+dispersion), through record-breaking group delays (2023, 2864~ps, 65.87~ns$\cdot$nm
+delay-bandwidth product), to ultrabroadband pulse compression (2025, 164~nm bandwidth,
+62~fs pulses). We further discuss digitally tunable positive/negative dispersion using
+chirped multimode waveguide gratings ($\pm$63.77~ps/nm) and TM-type fabrication-robust
+designs. The application of SiN apodized chirped gratings for dispersion management
+in integrated mode-locked lasers is reviewed, along with III-V/SiN heterogeneous
+integration schemes. Finally, we summarize derivative technologies including
+contra-directional couplers, subwavelength grating chirped structures, and
+reconfigurable Bragg gratings, and outline future research directions.
+
+\textbf{Keywords:} chirped Bragg grating; silicon nitride waveguide; dispersion
+compensation; mode-locked laser; integrated photonics; coupled-mode theory;
+transfer matrix method; pulse compression; contra-directional coupler
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ===========================================================================
+% §1 引言
+% ===========================================================================
+\section{引言}
+
+\subsection{色散管理：从光纤到片上集成}
+
+色散是限制光通信系统容量和超快光学性能的核心因素之一。在光纤传输中，
+群速度色散（Group Velocity Dispersion, GVD）导致脉冲时域展宽，
+限制单信道速率和传输距离。在超快激光器中，腔内净色散决定了脉冲形成机制——
+孤子锁模需要净反常色散，而展宽脉冲锁模则需要近零净色散。
+精确控制色散是实现高性能飞秒脉冲产生、放大和压缩的前提。
+
+1987年，加拿大通信研究中心Fran\c{c}ois Ouellette在\textit{Optics Letters}上
+发表了奠基性论文~\cite{ouellette1987}，首次提出利用线性啁啾布拉格光栅滤波器
+实现波导中色散抵消的理论框架（至今被引775+次）。其核心思想简洁而深刻：
+布拉格波长$\lambda_B = 2n_{\text{eff}}\Lambda$取决于有效折射率$n_{\text{eff}}$和
+光栅周期$\Lambda$。若周期沿传播方向渐变（啁啾），不同波长的光将在光栅的不同
+空间位置被反射——短波在周期较短的近端反射，长波在周期较长的远端反射——
+从而引入波长相关的群延迟$\tau_g(\lambda)$。线性啁啾对应近似线性的群延迟响应，
+其斜率即为群延迟色散（Group Delay Dispersion, GDD）。
+
+1994--1995年迎来了啁啾光纤布拉格光栅（Chirped Fiber Bragg Grating, CFBG）
+色散补偿的实验爆发期。K.O. Hill（Bragg光栅之父）等人~\cite{hill1994}首次实现了
+啁啾光纤光栅的色散补偿；Eggleton等人~\cite{eggleton1994}演示了自啁啾光栅的
+脉冲再压缩；Ouellette与Krug等人~\cite{ouellette1995}通过啁啾采样光栅
+实现了WDM系统的多信道色散补偿，在240~km、10~Gbit/s传输实验中验证。
+到1995年底，Loh等人~\cite{loh1995}已将10~cm啁啾光纤光栅成功用于
+400~km的10~Gbit/s传输实验，标志着CFBG从实验室概念走向实用化。
+
+然而，光纤光栅受限于厘米量级长度（光纤弯曲半径限制）、温度敏感性和
+难以与其他光子元件集成的固有局限。进入21世纪，硅基光子学的发展
+将啁啾布拉格光栅从光纤平台推向片上集成。2007年，Strain的博士论文
+首次系统研究了集成啁啾布拉格光栅的色散控制~\cite{strain2007}，
+发展了基于CMT的传输矩阵法并与FDTD验证。2010年，
+Strain与Sorel等人~\cite{strain2010}在III-V半导体平台上展示了
+深刻蚀侧壁啁啾光栅的色散控制。
+
+\subsection{氮化硅平台的崛起}
+
+氮化硅作为CMOS兼容的介电光子学材料，近年来已成为实现高性能片上啁啾
+布拉格光栅的首选平台~\cite{gardes2022}。相比于硅绝缘体（SOI）平台，
+SiN具有以下决定性优势：
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{超低传播损耗}：LPCVD SiN波导在1550~nm波段的传播损耗可低至
+  \SI{0.05}{dB/cm}（甚至$\sim$\SI{1}{dB/m}）~\cite{du2020}。
+  这使厘米乃至数十厘米量级的超长光栅成为可能——而光栅长度$L$与
+  群延迟$\tau_g$成正比：$\tau_g \propto 2n_g L/c$。
+\item \textbf{无双光子吸收（TPA）}：Si$_3$N$_4$的带隙（$\sim$\SI{5}{eV}）
+  远大于1550~nm光子能量（$\sim$\SI{0.8}{eV}），因此无TPA和
+  随之而来的自由载流子吸收（FCA）。这在高功率脉冲压缩和锁模激光器
+  应用中至关重要。
+\item \textbf{弱热光敏感性}：SiN的热光系数（$dn/dT \approx 4\times10^{-5}$~K$^{-1}$）
+  显著低于硅（$1.8\times10^{-4}$~K$^{-1}$），有利于温度稳定的色散器件。
+\item \textbf{适中的Kerr非线性}：$n_2 \approx 2.4\times10^{-19}$~m$^2$/W，
+  结合超低损耗可实现高效的非线性相互作用，如超连续谱产生和频率梳生成。
+\item \textbf{异质集成能力}：微转移打印（$\mu$TP）和倒装焊（flip-chip）
+  等III-V-on-SiN集成方案日臻成熟~\cite{cuyvers2021,hermans2021,vissers2021}，
+  为完整片上锁模激光器提供了增益路径。
+\end{enumerate}
+
+\subsection{本综述的范围和结构}
+
+本文重点综述氮化硅波导啁啾布拉格光栅在\textbf{色散补偿}和
+\textbf{集成锁模激光器}两大方向的研究进展，覆盖1987年至2026年间的40余篇核心文献。
+结构如下：第2节介绍CBG的基本原理和设计方法；
+第3节综述SiN CBG在色散补偿中的发展（按时间线从螺旋光栅到超宽带脉冲压缩）；
+第4节介绍啁啾多模波导光栅的正/负色散可调谐方案和TM型工艺鲁棒设计；
+第5节介绍CBG在集成锁模激光器中的应用；
+第6节讨论逆向耦合器、亚波长光栅和可重构光栅等衍生技术；
+第7节总结并展望未来方向。
+
+\newpage
+
+% ===========================================================================
+% §2 基本原理与设计方法
+% ===========================================================================
+\section{啁啾布拉格光栅的基本原理与设计方法}
+
+\subsection{布拉格光栅的耦合模理论}
+
+均匀布拉格光栅是一维光子带隙结构，其核心物理机制是前向传播模式与
+后向传播模式之间通过周期性折射率微扰$\Delta n(z)$的共振耦合。
+根据耦合模理论（Coupled-Mode Theory, CMT），对于单模波导中的弱耦合光栅，
+前向波幅度$A(z)$和后向波幅度$B(z)$满足~\cite{ouellette1987}：
+
+\begin{equation}
+\frac{dA}{dz} = -j\kappa B(z)\, e^{+j2\Delta\beta z}, \qquad
+\frac{dB}{dz} = +j\kappa^* A(z)\, e^{-j2\Delta\beta z}
+\label{eq:cmt}
+\end{equation}
+
+其中$\kappa$为耦合系数（单位：m$^{-1}$），与折射率调制幅度$\Delta n$成正比；
+$\Delta\beta = \beta - \pi/\Lambda$为相位失配量，
+$\beta = 2\pi n_{\text{eff}}/\lambda$为传播常数。
+布拉格共振条件$\Delta\beta = 0$给出布拉格波长
+$\lambda_B = 2n_{\text{eff}}\Lambda$。
+
+对于长度为$L$、耦合系数$\kappa$为常数的均匀光栅，
+式(\ref{eq:cmt})存在解析解。功率反射率$R = |B(0)/A(0)|^2$为：
+
+\begin{equation}
+R(\lambda) = \frac{|\kappa|^2 \sinh^2(\gamma L)}
+                  {\gamma^2 \cosh^2(\gamma L) + \Delta\beta^2 \sinh^2(\gamma L)},
+\quad \gamma = \sqrt{|\kappa|^2 - \Delta\beta^2}
+\label{eq:reflectivity}
+\end{equation}
+
+在布拉格波长处（$\Delta\beta = 0$）：
+$R_{\max} = \tanh^2(|\kappa|L)$，带宽近似为
+$\Delta\lambda_{\text{BW}} \approx \frac{\lambda_B^2}{\pi n_g}
+\sqrt{|\kappa|^2 + (\pi/L)^2}$。
+
+\subsection{啁啾机制}
+
+啁啾布拉格光栅的核心特征是布拉格波长沿光传播方向变化，即
+$\lambda_B(z) = 2n_{\text{eff}}(z) \Lambda(z)$。
+三种主要的啁啾实现方式为（图~\ref{fig:chirp_methods}）：
+
+\textbf{(a) 光栅周期啁啾：} 波导宽度$W_0$恒定，
+光栅周期沿长度方向单调变化$\Lambda(z)$。
+这是光纤光栅中最常用的方法（通过啁啾相位掩模板实现），
+但在片上波导中需要精确控制电子束光刻的剂量变化。
+
+\textbf{(b) 波导宽度啁啾：} 光栅周期$\Lambda$恒定，
+波导宽度$W(z)$渐变。由于$n_{\text{eff}}$是宽度$W$的函数，
+宽度的变化间接改变布拉格波长$\lambda_B(z) = 2n_{\text{eff}}(W(z))\Lambda$。
+此方法的优势是光栅周期恒定，电子束光刻中只需改变波导宽度，
+制造容差更高~\cite{shi2014}。
+
+\textbf{(c) 联合啁啾（ERI-TMM方法）~\cite{praena2024}：}
+2024年，Praena和Carballar提出了同时变化周期和宽度的联合啁啾方法。
+其核心创新在于保持平均有效折射率$n_{\text{eff}}^{\text{avg}} = [n_{\text{eff}}(W_{\max})
++ n_{\text{eff}}(W_{\min})]/2$沿光栅长度恒定。这提供了两种优势：
+(i) 在相同几何参数变化范围内获得更大的啁啾带宽；
+(ii) 对相同的目标带宽，几何参数变化更和缓，更有利于制造。
+
+对于线性啁啾光栅（$\lambda_B(z) = \lambda_{B,\min} + (\Delta\lambda_B/L)z$），
+群延迟和色散的近似表达式为：
+
+\begin{equation}
+\tau_g(\lambda) \approx \frac{2n_g}{c} \cdot \frac{L(\lambda - \lambda_{B,\min})}
+                                            {\Delta\lambda_B},
+\quad D \equiv \frac{d\tau_g}{d\lambda} \approx \frac{2n_g L}{c\,\Delta\lambda_B}
+\label{eq:dispersion}
+\end{equation}
+
+其中$n_g = n_{\text{eff}} - \lambda\,dn_{\text{eff}}/d\lambda$为群折射率。
+式(\ref{eq:dispersion})揭示了啁啾光栅色散工程的核心权衡：
+\textbf{色散量$|D|$正比于光栅长度$L$，反比于啁啾带宽$\Delta\lambda_B$}。
+长光栅提供大色散，但带宽减小；短光栅提供宽带宽，但色散减小。
+这一基本权衡贯穿了整个领域的发展。
+
+\subsection{传输矩阵法（TMM）}
+
+耦合模理论的解析解（式~\ref{eq:reflectivity}）仅适用于均匀光栅。
+对于具有任意啁啾和切趾分布的复杂光栅，传输矩阵法（TMM）
+是最常用的半解析工具~\cite{strain2007,cheng2021}。
+
+TMM将光栅沿长度方向离散为$N$个足够短的均匀段（典型长度$\Delta z \ll
+\min\{\Lambda, 1/\kappa\}$），每段用$2\times2$复传输矩阵表示：
+
+\begin{equation}
+\mathbf{T} = \prod_{i=1}^{N} \mathbf{T}_i, \quad
+\mathbf{T}_i =
+\begin{bmatrix}
+\cosh(\gamma_i\Delta z) - j\frac{\Delta\beta_i}{\gamma_i}\sinh(\gamma_i\Delta z) &
+-j\frac{\kappa_i}{\gamma_i}\sinh(\gamma_i\Delta z) \\[4pt]
++j\frac{\kappa_i^*}{\gamma_i}\sinh(\gamma_i\Delta z) &
+\cosh(\gamma_i\Delta z) + j\frac{\Delta\beta_i}{\gamma_i}\sinh(\gamma_i\Delta z)
+\end{bmatrix}
+\label{eq:tmm}
+\end{equation}
+
+通过级联$N$个矩阵并提取反射系数$r = T_{21}/T_{11}$，
+可得到反射谱$R(\lambda) = |r|^2$和反射相位$\phi_r(\lambda) = \arg(r)$，
+进而计算群延迟$\tau_g = d\phi_r/d\omega$和色散$D = d\tau_g/d\lambda$。
+典型的分段数$N = 500$--$2000$即可保证收敛，仿真时间在秒量级。
+
+\subsection{有效折射率传输矩阵法（ERI-TMM）}
+
+传统TMM将耦合系数$\kappa$和失配量$\Delta\beta$作为输入参数。
+然而，对于高折射率差集成波导（如SOI，$\Delta n \approx 2.0$），
+侧壁调制不仅改变耦合强度，还会显著改变模式的有效折射率——
+这是一种二阶效应，传统CMT难以精确描述。
+
+Praena和Carballar（2024年）提出了有效折射率传输矩阵法（ERI-TMM）
+~\cite{praena2024}。该方法的核心创新在于：不通过CMT近似获取$\kappa$和
+$\Delta\beta$，而是直接使用从模式求解器（如Lumerical MODE或COMSOL）获得的
+$n_{\text{eff}}(\lambda, W)$数据库，基于几何参数计算每个TMM段的传输矩阵。
+ERI-TMM具有以下优势：
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item 自动包含波导几何引起的$n_{\text{eff}}(\lambda, W)$色散效应；
+\item 不需要CMT的弱耦合假设，对强耦合光栅同样适用；
+\item 计算效率远高于全波FDTD仿真（典型仿真$<$1秒，vs.\ FDTD数小时至数天）；
+\item 适合作为优化循环中的正向模型。
+\end{itemize}
+
+\subsection{切趾技术}
+
+理想有限长啁啾光栅两端存在因 Fabry-Perot 效应引起的群延迟波纹
+（GDR, Group Delay Ripple）。切趾（apodization）通过使耦合系数
+$\kappa(z)$在光栅两端平滑过渡至零来抑制这些波纹。
+常用的切趾函数包括tanh、高斯、升余弦和Blackman窗函数~\cite{sinobad2025}。
+对于tanh切趾：
+
+\begin{equation}
+\kappa(z) = \kappa_0 \cdot \tanh\!\left(\frac{\alpha z}{L}\right)
+            \cdot \tanh\!\left(\frac{\alpha(L-z)}{L}\right)
+\label{eq:apod}
+\end{equation}
+
+其中$\alpha$控制过渡区的陡峭程度。切趾对实现宽带平坦GDD至关重要，
+尤其在锁模激光器中，色散波纹会直接影响脉冲质量和稳定性。
+
+在片上波导光栅中，切趾可通过沿长度方向逐渐减小侧壁调制深度
+（corrugation depth apodization）或通过Cheng与Chrostowski提出的
+周期相位调制等效切趾方法~\cite{cheng2021}实现。
+
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[scale=0.95]
+
+% ====== (a) 周期啁啾 ======
+\begin{scope}[local bounding box=subfig_a]
+  % 波导芯
+  \fill[sinblue!20] (-4.5,-0.7) rectangle (4.5,0.7);
+  \draw[sinblue!60,very thick] (-4.5,0.7) -- (4.5,0.7);
+  \draw[sinblue!60,very thick] (-4.5,-0.7) -- (4.5,-0.7);
+  % 啁啾齿（周期递增）
+  \foreach \x/\dp in {-4.0/0.18,-3.5/0.18,-3.0/0.20,-2.5/0.20,-2.0/0.22,-1.5/0.22,
+                      -1.0/0.24,-0.5/0.24,0.0/0.26,0.5/0.28,1.0/0.30,1.5/0.32,
+                      2.0/0.34,2.5/0.36,3.0/0.38,3.5/0.40,4.0/0.42} {
+    \fill[gratingred!80] (\x-\dp/2,-0.7) rectangle (\x+\dp/2,0.7);
+  }
+  % 标注
+  \draw[stealth-stealth] (-4.0,1.0) -- (-3.5,1.0) node[midway,above] {\footnotesize $\Lambda_{\min}$};
+  \draw[stealth-stealth] (3.5,1.0) -- (4.0,1.0) node[midway,above] {\footnotesize $\Lambda_{\max}$};
+  \node at (0,-1.2) {\textbf{(a)} 光栅周期啁啾：$W_0$ 恒定，$\Lambda(z)$ 变化};
+  \node[anchor=west] at (-4.5,-1.2) {$\lambda_B(z)=2n_{\text{eff}}\Lambda(z)$};
+\end{scope}
+
+% ====== (b) 宽度啁啾 ======
+\begin{scope}[local bounding box=subfig_b,shift={(0,-3.2)}]
+  \fill[sinblue!20] (-4.5,-0.7) rectangle (4.5,0.7);
+  \draw[sinblue!60,very thick] (-4.5,0.7) -- (4.5,0.7);
+  \draw[sinblue!60,very thick] (-4.5,-0.7) -- (4.5,-0.7);
+  % 恒定周期齿，变化宽度
+  \foreach \x/\w in {-4.0/0.7,-3.5/0.8,-3.0/0.9,-2.5/1.0,-2.0/1.1,-1.5/1.2,
+                     -1.0/1.3,-0.5/1.4,0.0/1.5,0.5/1.6,1.0/1.7,1.5/1.8,
+                     2.0/1.9,2.5/2.0,3.0/2.1,3.5/2.2,4.0/2.3} {
+    \fill[gratingred!80] (\x-0.15,{-\w*0.27}) rectangle (\x+0.15,{\w*0.27});
+  }
+  \draw[stealth-stealth] (-4.7,0.6) -- (-4.7,-0.6) node[midway,left] {\footnotesize $W_{\min}$};
+  \draw[stealth-stealth] (4.7,0.6) -- (4.7,-0.6) node[midway,right] {\footnotesize $W_{\max}$};
+  \node at (0,-1.2) {\textbf{(b)} 波导宽度啁啾：$\Lambda$ 恒定，$W(z)$ 变化};
+  \node[anchor=west] at (-4.5,-1.2) {$\lambda_B(z)=2n_{\text{eff}}(W(z))\Lambda$};
+\end{scope}
+
+% ====== (c) 联合啁啾 ======
+\begin{scope}[local bounding box=subfig_c,shift={(0,-6.4)}]
+  \fill[sinblue!20] (-4.5,-0.7) rectangle (4.5,0.7);
+  \draw[sinblue!60,very thick] (-4.5,0.7) -- (4.5,0.7);
+  \draw[sinblue!60,very thick] (-4.5,-0.7) -- (4.5,-0.7);
+  \foreach \x/\dp/\w in {-4.0/0.16/0.8,-3.5/0.17/1.0,-3.0/0.18/1.2,-2.5/0.20/1.4,
+                         -2.0/0.22/1.5,-1.5/0.24/1.6,-1.0/0.26/1.7,-0.5/0.28/1.8,
+                         0.0/0.30/1.9,0.5/0.32/2.0,1.0/0.34/2.1,1.5/0.36/2.2,
+                         2.0/0.38/2.2,2.5/0.40/2.3,3.0/0.42/2.3,3.5/0.44/2.4,4.0/0.46/2.4} {
+    \fill[gratingred!80] (\x-\dp/2,{-\w*0.27}) rectangle (\x+\dp/2,{\w*0.27});
+  }
+  \node at (0,-1.2) {\textbf{(c)} 联合啁啾（Praena \& Carballar, 2024~\cite{praena2024}）};
+  \node[anchor=west] at (-4.5,-1.2) {周期$\uparrow$ + 宽度$\uparrow$: $n_{\text{eff}}^{\text{avg}}$ 恒定};
+\end{scope}
+
+% 光传播方向
+\draw[-{Latex[length=3mm]},very thick,sinblue] (-5.3,0.7) -- (-5.3,-8.0)
+  node[midway,left,text width=0.8cm,align=center,font=\small] {光 \\ 传 \\ 播};
+
+\end{tikzpicture}
+\caption{片上啁啾布拉格光栅的三种啁啾实现方式。（a）光栅周期啁啾：波导宽度$W_0$固定，
+光栅周期$\Lambda(z)$随位置单调递增，短波长（蓝色）在近端（小周期）反射，
+长波长（红色）在远端（大周期）反射，产生正的群延迟斜率（反常色散）。
+（b）波导宽度啁啾：光栅周期$\Lambda$恒定，波导宽度$W(z)$渐变，
+通过$n_{\text{eff}}(W)$的变化间接改变布拉格波长，制造容差更优。
+（c）联合啁啾：同时变化周期和宽度，保持平均$n_{\text{eff}}$恒定，
+在相同参数范围下提供更大带宽或更和缓的几何变化。}
+\label{fig:chirp_methods}
+\end{figure}
+
+\newpage
+
+% ===========================================================================
+% §3 色散补偿研究进展
+% ===========================================================================
+\section{片上色散补偿研究进展}
+
+片上色散补偿是啁啾布拉格光栅在集成光子学中最核心的应用方向。
+本节按时间顺序梳理该领域的关键进展，从2010年前后的早期探索，
+到2020年螺旋光栅的里程碑突破，再到2025年超宽带脉冲压缩的最新成果。
+
+\subsection{早期探索与III-V平台（2007--2019）}
+
+片上啁啾布拉格光栅的色散补偿研究始于III-V半导体平台。
+Strain在其2007年博士论文~\cite{strain2007}中系统发展了基于CMT的TMM分析方法，
+并通过FDTD仿真验证了锥形波导啁啾光栅的设计。2010年，
+Strain与Sorel等人~\cite{strain2010}在\textit{IEEE J. Quantum Electron.}上
+报道了AlGaAs/GaAs平台上的单片集成啁啾布拉格光栅，
+采用深刻蚀侧壁光栅提供高耦合系数，通过锥形波导宽度实现啁啾，
+实验验证了TMM和FDTD的仿真预测。
+
+2013--2014年，UBC的Shi与Chrostowski等人~\cite{shi2013,shi2014}开创性地
+将逆向耦合器（Contra-DC）引入啁啾延迟线领域。
+2014年在\textit{Optics Letters}上演示了基于线性啁啾逆向耦合器的
+可调谐纳米光子延迟线：利用锥形肋宽实现线性啁啾（光栅周期保持恒定），
+仅0.015~mm$^2$占位面积实现96~ps群延迟和$-$11~ps/nm负色散。
+逆向耦合器的add-drop四端口设计天然无需光环行器，
+为片上色散补偿的实用化提供了关键方案。
+
+2019年，Glasgow大学的Klitis、Sorel和Strain~\cite{klitis2019}
+在\textit{Micromachines}上报道了利用热光效应的可调谐硅布拉格光栅色散控制：
+通过在光栅上方集成热加热器产生可控温度梯度，
+在单一器件上实现了从红啁啾到蓝啁啾的连续可调群延迟斜率。
+同年，MIT的Shtyrkova、Callahan与K\"{a}rtner等人~\cite{shtyrkova2019}
+在CMOS兼容SiN平台上实现了完全集成的Q开关锁模激光器
+（工作波长1900~nm），其中的色散管理正是由宽带（$>$100~nm）
+SiN色散补偿光栅完成的——这是SiN啁啾光栅在集成锁模激光器中的
+首次关键应用。
+
+\subsection{螺旋光栅时代：群延迟竞赛（2020--2023）}
+
+\subsubsection{Du等人（2020）：13.8~cm螺旋光栅的里程碑}
+
+2020年，清华大学陈宏伟课题组与美国UCSB的Bowers组合作，
+在\textit{APL Photonics}上发表了里程碑式成果~\cite{du2020}。
+他们首次将啁啾布拉格光栅弯曲成螺旋几何形状（图~\ref{fig:spiral}），
+在仅$\sim$2.8~mm外径的面积内实现了13.8~cm有效光栅长度。
+器件采用SiN-on-insulator平台，波导传播损耗低至\SI{0.05}{dB/cm}。
+在9.2~nm反射带宽（1556.3--1565.5~nm）内实现了\textbf{1440~ps}群延迟
+和\textbf{$-$156.5~ps/nm}色散。群延迟响应呈现优异的线性度，
+且具有良好的温度稳定性。
+
+这一工作标志着SiN啁啾布拉格光栅领域的两个关键突破：
+(1) 首次展示了厘米级螺旋波导光栅的可行性；
+(2) \SI{0.05}{dB/cm}的超低损耗为后续超长光栅奠定了材料基础。
+
+\subsubsection{Li等人（2022--2023）：2864~ps群延迟和65.87~ns$\cdot$nm延迟-带宽积}
+
+2022--2023年，研究者在800~nm高度SiN平台上进一步刷新了群延迟记录。
+该平台采用更厚的SiN芯层（800~nm vs.\ 传统的400~nm以下），
+显著增大了模式有效面积，进一步降低了传播损耗（$\sim$\SI{0.15}{dB/cm}）。
+同时，采用了锥形反对称布拉格光栅设计（Tapered Antisymmetric Bragg Grating），
+通过反对称光栅结构增强耦合效率。
+
+2022年在\textit{Proc. SPIE}上~\cite{li2022}报道了
+20.11~cm螺旋锥形反对称布拉格光栅波导（STABGW），
+结合非对称定向耦合器实现无环行器操作。
+实现\textbf{2852~ps}群延迟（23~nm带宽），插入损耗5.4~dB@1550~nm。
+
+2023年在\textit{Optics Express}上~\cite{li2023}报道了
+指数啁啾多模螺旋波导反对称布拉格光栅，结合定向耦合器
+实现无环行器操作。关键性能指标：
+\textbf{2864~ps}群延迟——当时片上啁啾波导布拉格光栅的最大值；
+\textbf{65.87~ns$\cdot$nm}延迟-带宽积——当时片上器件的最大值；
+23~nm带宽，总插入损耗6~dB@1550~nm，
+延迟损耗1.57~dB/ns。
+
+\subsubsection{关键性能权衡分析}
+
+图~\ref{fig:performance_tradeoff}总结了2020--2025年间
+SiN啁啾布拉格光栅色散补偿的性能演进。
+可以清晰地看到两个主要的技术路线：
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{大群延迟路线}：追求纳秒级群延迟（$>$2000~ps），
+  服务于微波光子真时延波束形成和光缓存。这需要超长光栅
+  （$>$10~cm）和超低损耗波导（$<$\SI{0.2}{dB/cm}），
+  但代价是带宽有限（通常$<$25~nm）。
+\item \textbf{大带宽路线}：追求百纳米级带宽（$>$100~nm），
+  服务于飞秒脉冲压缩和宽带色散管理。这需要在相对短的光栅
+  （$<$\SI{10}{cm}）中引入大量啁啾，但代价是群延迟总量减小。
+\end{enumerate}
+
+这两种路线的根本矛盾来自式(\ref{eq:dispersion})：
+$|D| = 2n_g L/(c\Delta\lambda_B)$，对于给定的色散量$D$，
+$L \uparrow \Rightarrow \Delta\lambda_B \uparrow$（且增加光栅长度
+会增加传播损耗），而$\Delta\lambda_B \uparrow \Rightarrow L \uparrow$
+（需要更长的光栅来维持相同的色散密度）。
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[scale=1.0]
+% 裁剪区域防止双曲线超出范围
+\clip (0,0) rectangle (12,5.5);
+% 坐标系
+\draw[-{Latex[length=2mm]}] (0,0) -- (12,0) node[right] {带宽 $\Delta\lambda$ (nm)};
+\draw[-{Latex[length=2mm]}] (0,0) -- (0,5.5) node[above] {群延迟 $\tau_g$ (ps)};
+
+% 网格
+\foreach \x in {2,4,6,8,10} {\draw[gray!15] (\x,0) -- (\x,5);}
+\foreach \y in {1,2,3,4,5} {\draw[gray!15] (0,\y) -- (11.5,\y);}
+
+% 数据点
+\fill[sinblue] (0.92,1.44) circle (3pt) node[above right,font=\tiny] {Du 2020};
+\fill[sinblue] (0.94,2.44) circle (3pt) node[above right,font=\tiny] {Chen 2021};
+\fill[sinblue] (2.3,2.85) circle (3pt) node[above right,font=\tiny] {Li 2022};
+\fill[sinblue] (2.3,2.86) circle (3pt) node[above left,font=\tiny] {Li 2023};
+
+% 双曲线趋势 (D = constant: 56 ps/nm, 156 ps/nm, 558 ps/nm)
+\draw[gratingred!60,dashed,thick,domain=0.5:11.5,samples=50]
+  plot (\x, {0.56 / (\x*0.1)});
+\node[gratingred!60,font=\tiny,rotate=-45] at (4.5,1.0) {$D=5.6$ ps/nm (等色散线)};
+
+\draw[gratingred!80,dashed,thick,domain=0.5:11.5,samples=50]
+  plot (\x, {1.56 / (\x*0.1)});
+\node[gratingred!80,font=\tiny,rotate=-50] at (3.0,3.5) {$D=15.6$ ps/nm};
+
+% 色散量标注
+\draw[-{Latex[length=1.5mm]},gratingred!90,thick] (0.2,2.86) -- (2.1,2.86)
+  node[midway,below,font=\tiny] {$D_{2023} < D_{2020}$};
+
+% 大群延迟区
+\fill[blue!5] (0,2.5) rectangle (4,5.5);
+\node[font=\small,blue!60] at (2,5.2) {大群延迟路线};
+
+% 大带宽区
+\fill[green!5] (6,0) rectangle (12,2.0);
+\node[font=\small,green!60!black] at (9,1.7) {大带宽路线（正在发展中）};
+
+% 轴标签
+\node[rotate=90] at (-0.5,2.5) {群延迟 $\tau_g$ ($\times$1000 ps)};
+\node at (6,-0.5) {啁啾带宽 $\Delta\lambda_B$ (nm $\times$ 10)};
+\end{tikzpicture}
+\caption{SiN啁啾布拉格光栅色散补偿的性能权衡图。
+蓝色点表示已实现的器件（2020--2023），红色虚线为等色散量曲线（$D = \tau_g/\Delta\lambda_B$）。
+可见当前报道主要集中在两个区域：大群延迟（$>$2000~ps，小带宽）和大带宽
+（$>$50~nm，小群延迟），两者由$D \propto L/\Delta\lambda_B$的基本关系约束。
+绿色区域——同时满足大群延迟和大带宽——是未来需要突破的方向。}
+\label{fig:performance_tradeoff}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[scale=0.72]
+
+% === 螺旋光栅示意 ===
+\begin{scope}[local bounding box=spiral]
+  % 螺旋线
+  \draw[sinblue,very thick,domain=0:1080,samples=200,smooth,
+        variable=\t]
+    plot ({0.08*\t*cos(\t)/50}, {0.08*\t*sin(\t)/50});
+  % 中心耦合区
+  \fill[gratingred!60] (-0.1,-0.1) rectangle (0.1,0.1);
+  % 输入输出波导
+  \draw[sinblue,very thick,-{Latex[length=2mm]}] (-3.5,0) -- (-1.5,0);
+  \draw[sinblue,very thick] (1.5,0) -- (3.5,0);
+  \node at (3.8,0) {\footnotesize 输出};
+  \node at (-3.8,0) {\footnotesize 输入};
+  % 啁啾周期标注
+  \draw[decorate,decoration={brace,amplitude=6pt,mirror},gratingred]
+    (-1.5,-1.6) -- (1.5,-1.6) node[midway,below,yshift=-4pt]
+    {\footnotesize 啁啾Bragg光栅 ($L \sim$ 10--20~cm)};
+  % 尺寸标注
+  \draw[stealth-stealth] (-2.0,1.5) -- (2.0,1.5)
+    node[midway,above] {\footnotesize 外径 $\sim$2.8--5 mm};
+\end{scope}
+
+% === 逆向耦合器示意 ====
+\begin{scope}[local bounding box=contradc,shift={(9,0)}]
+  % 波导1 (Through)
+  \draw[sinblue!70,very thick] (-2.5,0.8) -- (2.5,0.8)
+    node[right] {\footnotesize Through};
+  % 波导2 (Drop)
+  \draw[sinblue!70,very thick] (-2.5,-0.8) -- (2.5,-0.8)
+    node[right] {\footnotesize Drop};
+  % 光栅区域
+  \fill[gratingred!20] (-2.0,-1.2) rectangle (2.0,1.2);
+  \foreach \x/\dp in {-1.8/0.08,-1.4/0.09,-1.0/0.10,-0.6/0.11,-0.2/0.12,
+                      0.2/0.13,0.6/0.14,1.0/0.15,1.4/0.16,1.8/0.17} {
+    \fill[gratingred!80] (\x-\dp/2,-0.8) rectangle (\x+\dp/2,-0.2);
+    \fill[gratingred!80] (\x-\dp/2,0.2) rectangle (\x+\dp/2,0.8);
+  }
+  % 标注
+  \draw[-{Latex[length=2mm]},very thick,sinblue] (-2.5,0.8) -- (-1.0,0.8);
+  \node at (0,1.5) {\footnotesize 啁啾光栅（相向耦合）};
+  % 输入
+  \draw[-{Latex[length=2mm]},very thick,sinblue] (-3.0,0.8) -- (-2.5,0.8);
+  \node at (-3.3,0.8) {\footnotesize In};
+  % 波长分离
+  \node[font=\footnotesize,gratingred] at (0.5,-1.5) {$\lambda_1\cdots\lambda_N$};
+  % Add 端口
+  \draw[{Latex[length=2mm]}-,very thick,sinblue] (-3.0,-0.8) -- (-2.5,-0.8);
+  \node at (-3.3,-0.8) {\footnotesize Add};
+\end{scope}
+
+\node at (0,-2.3) {\textbf{(a)} 螺旋啁啾布拉格光栅（螺旋CBG）};
+\node at (9,-2.3) {\textbf{(b)} 啁啾逆向耦合器（Contra-DC）};
+
+% ====== 图例 ======
+\begin{scope}[shift={(4.5,-4.5)}]
+  \node[text width=12cm,align=left,font=\small] {
+    \textbf{(a)} 螺旋CBG：长光栅（$L=10$--20~cm）弯曲成阿基米德螺旋，
+    在紧凑面积内实现超大群延迟。工作于反射模式，需结合环行器或定向耦合器。
+    \textbf{(b)} Contra-DC：啁啾光栅辅助两平行波导间的相向耦合，
+    天然实现add-drop四端口操作——输入端注入宽带光，
+    不同波长在光栅不同位置耦合至Drop端口，产生波长相关群延迟。
+    \textbf{无需光环行器}，是实现实用化片上色散管理的关键架构。
+  };
+\end{scope}
+
+\end{tikzpicture}
+\caption{两种主要的片上啁啾色散器件架构。（a）螺旋啁啾布拉格光栅：
+将厘米级长光栅弯曲为阿基米德螺旋，在毫米级面积内实现纳秒级群延迟。
+（b）啁啾逆向耦合器（Contra-DC）：四端口add-drop设计天然避免环行器需求，
+啁啾光栅辅助两平行波导间的相向耦合以产生波长相关群延迟。}
+\label{fig:spiral}
+\end{figure}
+
+\subsection{包层调制与超宽带脉冲压缩（2023--2025）}
+
+\subsubsection{Liu等人（2024）：包层调制啁啾光栅}
+
+2024年CLEO-PR会议上，研究者报道了基于包层调制（Cladding-modulated）
+的啁啾布拉格光栅~\cite{liu2024a}。与传统的侧壁调制不同，
+包层调制通过在波导包层中引入周期性折射率变化，
+使光场在包层调制区域中的倏逝场感知光栅结构。
+由于模式场主要分布在波导芯中，包层调制对传播损耗的影响较小，
+且通过阿基米德螺旋实现了20.11~cm的有效光栅长度。
+在2.8~nm带宽内实现\textbf{558~ps/nm}色散——报告的最大片上色散密度。
+该方案同样采用无环行器操作。
+
+\subsubsection{Sinobad等人（2025）：164~nm带宽和62~fs脉冲压缩}
+
+2025年，CFEL/DESY的K\"{a}rtner组（Sinobad、Lorenzen、Francis等）
+取得了色散补偿啁啾布拉格光栅的重大突破~\cite{sinobad2025}。
+利用SiN-on-Insulator平台上的切趾啁啾布拉格光栅（ACG），
+在1550~nm波段实现：
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item \textbf{164~nm}反射带宽——硅基芯片布拉格光栅的记录值；
+\item \textbf{170~fs $\rightarrow$ 62~fs}脉冲压缩（压缩因子2.7）；
+\item \textbf{首次}在硅芯片上实现亚100~fs脉冲压缩。
+\end{itemize}
+
+这一突破的关键在于：(1) 精心设计的切趾函数有效抑制了群延迟波纹；
+(2) 优化的啁啾率分布使GDD在宽波长范围内保持平坦；
+(3) SiN-on-Insulator平台的低损耗保证了足够的光栅长度。
+
+\subsubsection{Huang等人（2025）：2~$\mu$m波段宽带色散补偿}
+
+2025年，Huang等人在\textit{Optics Express}上报道了
+将SiN啁啾布拉格光栅拓展至2~$\mu$m波段的工作~\cite{huang2025}。
+采用切趾线性啁啾光栅与2$\times$2~MMI组合的无环行器方案，
+在2~$\mu$m波段实现80~nm工作带宽，最大群延迟58~ps，
+可调色散系数0.84~ps/nm。这一工作展示了SiN啁啾光栅
+在非通信波段（中红外）的应用潜力，为色散管理频率梳和
+分子光谱学提供了关键器件。
+
+同一时期，另外两个值得关注的结果包括：
+2025年IEEE会议上报道的使用两个略微色散偏移的布拉格光栅
+消除波导腔内色散波纹的方案~\cite{ripple2025}，
+以及Liu等人报道的利用非线性渐变宽度波导解决
+啁啾逆向耦合器群延迟非线性问题的方案~\cite{liu2023contra}。
+
+\begin{table}[p]
+\centering
+\caption{SiN啁啾布拉格光栅色散补偿核心性能指标汇总}
+\label{tab:performance_summary}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{文献} & \textbf{年份} & \textbf{平台} & \textbf{$\tau_g$ (ps)} & \textbf{$D$ (ps/nm)} & \textbf{$\Delta\lambda$ (nm)} & \textbf{$L$ (cm)} \\
+\midrule
+Du et al.~\cite{du2020} & 2020 & SiN (400 nm) & 1440 & $-$156.5 & 9.2 & 13.8 \\
+Chen et al.~\cite{chen2021} & 2021 & Si光子集成 & 2440 & $\sim$250 & $>$9.4 & -- \\
+Li et al.~\cite{li2022} & 2022 & SiN (800 nm) & 2852 & -- & 23 & 20.11 \\
+Li et al.~\cite{li2023} & 2023 & SiN (800 nm) & \textbf{2864} & -- & 23 & 20.11 \\
+Liu et al.~\cite{liu2024a} & 2024 & SiN & -- & \textbf{558} & 2.8 & 20.11 \\
+Sinobad et al.~\cite{sinobad2025} & 2025 & SiN-on-Insulator & -- & -- & \textbf{164} & -- \\
+Huang et al.~\cite{huang2025} & 2025 & SiN & 58 & 0.84 & 80 & -- \\
+\bottomrule
+\multicolumn{7}{c}{\small 粗体表示该项指标的最优值。$\tau_g$: 群延迟；$D$: 色散；$\Delta\lambda$: 带宽；$L$: 光栅长度。}
+\end{tabular}
+\end{table}
+
+\newpage
+
+% ===========================================================================
+% §4 啁啾多模波导光栅
+% ===========================================================================
+\section{啁啾多模波导光栅：正/负色散可调谐与工艺鲁棒设计}
+
+\subsection{数字可调谐正/负色散控制器}
+
+2023年，浙江大学戴道锌课题组在\textit{Advanced Photonics}上
+发表了突破性工作~\cite{liu2023advphoton}——基于双向啁啾多模波导光栅
+（CMWG）的数字可调谐正/负色散控制器。
+该器件通过级联两个啁啾方向相反的CMWG，
+结合热光开关网络选择光路，在单一芯片上实现了
+从\textbf{负色散到正色散}的完整调谐范围。
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item 色散调谐范围：\textbf{$-$61.53 $\sim$ +63.77 ps/nm}（20~nm带宽内）
+\item 调谐步长：4.16~ps/nm
+\item 最大群延迟：$\pm$1000~ps（对应$D \approx \pm 60$~ps/nm）
+\item 通过级联$N$级CMWG实现$2^N$个离散色散状态
+\end{itemize}
+
+该方案的意义在于：(1) 首次在单一芯片上实现了正/负色散的数字化切换，
+为自适应色散管理系统提供了关键器件；(2) 多模波导的使用增强了设计的自由度；
+(3) 热光开关的引入使得色散状态可通过电信号编程控制。
+
+\subsection{TM型CMWG：工艺鲁棒性设计}
+
+2024年，该课题组进一步在\textit{Chinese Optics Letters}上报道了
+TM型啁啾多模波导光栅（TM-CMWG）~\cite{liu2024col}。
+与传统的TE型CMWG相比，TM模式的模式场对侧壁粗糙度的敏感性
+显著降低——TM模式的电场主要垂直于波导侧壁界面，减少了侧壁散射。
+这带来了显著的工艺鲁棒性优势：
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item 30~mm螺旋CMWG实现\textbf{812.6~ps}群延迟——TM型CMWG的记录值
+\item 30.3~nm工作带宽，色散25.1~ps/nm
+\item 紧凑占位面积：0.6~mm $\times$ 0.46~mm
+\item 采用TM$_0$和TM$_1$模式之间的相位匹配实现布拉格耦合
+\item 无环行器操作，易于与其他片上元件集成
+\end{itemize}
+
+\subsection{多模硅光延迟线：突破延迟密度极限}
+
+2025年3月，该课题组在\textit{Light: Science \& Applications}上~\cite{hong2025}
+报道了多模硅光子延迟线的重大突破。
+通过支持TE$_0$、TE$_1$、TE$_2$三个模式同时传输，
+在3.85~mm$^2$的总面积内实现了12.7~ns的超大延迟和
+3299~ps/mm$^2$的创纪录延迟密度（延迟-密度积）。
+
+这一工作的核心创新在于多模架构：
+不同模式在同一物理波导中经历不同的传播常数和延迟，
+通过模式复用/解复用器实现模式的选择性激励和接收，
+从而在相同物理空间内实现多路独立延迟通道。
+虽然该工作本身使用的是均匀波导螺旋而非啁啾光栅，
+但其多模架构和超低损耗（TE$_0$: 0.2~dB/cm, TE$_1$: 0.31~dB/cm,
+TE$_2$: 0.49~dB/cm）对未来的啁啾多模光栅色散管理
+具有重要的参考价值。
+
+\newpage
+
+% ===========================================================================
+% §5 锁模激光器中的色散管理
+% ===========================================================================
+\section{集成锁模激光器中的啁啾光栅色散管理}
+
+片上锁模激光器是实现芯片级超快光源的核心器件。
+锁模激光器的脉冲形成机制取决于腔内净群延迟色散（Net GDD）：
+孤子锁模需要净反常色散（$D_{\text{net}} < 0$），
+展宽脉冲锁模需要近零净色散，
+而正常色散锁模则产生高度啁啾的长脉冲。
+啁啾布拉格光栅是实现腔内精确色散管理的关键元件。
+
+\subsection{SiN切趾啁啾光栅色散补偿}
+
+2016年，Callahan等人~\cite{callahan2016}在CLEO会议上
+首次报道了CMOS兼容SiN波导上的双啁啾布拉格光栅，
+针对飞秒脉冲压缩和锁模激光器腔内色散补偿。
+
+2019年，Shtyrkova等人~\cite{shtyrkova2019}在MIT与K\"{a}rtner组合作，
+报道了完全CMOS兼容的集成Q开关锁模激光器。
+该器件工作于1900~nm波段，在SiN平台上集成了三个关键功能模块：
+(1) 宽带色散补偿光栅（$>$100~nm带宽，提供反常色散）；
+(2) 片上人工可饱和吸收体；
+(3) 增益波导。
+产生17~nm光带宽，支持约215~fs脉冲。
+除泵浦源外所有元件均在片上，是集成锁模激光器的重要里程碑。
+
+2023--2024年，CFEL/DESY的K\"{a}rtner组（Sinobad、Lorenzen、
+Francis等）系统地表征了SiN切趾啁啾布拉格光栅在
+短波红外（SWIR）波段的性能~\cite{sinobad2023cleo,sinobad2023cleoeu}。
+这些研究表明：
+(1) CMOS兼容工艺制备的SiN ACG可实现高反射率（$>$90\%）
+和受控色散；
+(2) 切趾设计有效抑制了GDD波纹；
+(3) ACG的色散特性可在SWIR波段（1900--2100~nm）精确控制。
+
+\subsection{III-V/SiN异质集成锁模激光器}
+
+SiN本身没有光学增益——集成锁模激光器需要与III-V族增益介质
+进行异质集成。目前主要存在两种集成方案：
+
+\textbf{微转移打印（$\mu$TP, Ghent大学--IMEC）：}
+III-V coupon通过弹性印章精确打印到SiN波导上的预刻蚀凹陷区域，
+实现倏逝场耦合。Cuyvers等人~\cite{cuyvers2021}演示了
+基于$\mu$TP的III-V-on-SiN锁模频率梳激光器，
+755~MHz重复频率，RF线宽仅\textbf{1~Hz}，
+光线路宽$<$200~kHz。Hermans等人~\cite{hermans2021}
+进一步实现了电泵浦的3~GHz重复频率锁模激光器，
+片上脉冲能量约2~pJ，RF线宽400~Hz。
+
+\textbf{Butt-Coupling（Eindhoven理工大学）：}
+III-V芯片的端面直接与SiN波导的端面对准耦合。
+Vissers等人~\cite{vissers2021}首次展示了
+SiN扩展腔+III-V芯片的butt-coupling锁模激光二极管，
+RF线宽\textbf{31~Hz}——比单片InP锁模激光器好几个数量级。
+2022年扩展至双重复频率操作（2.18~GHz和15.5~GHz）。
+
+\subsection{色散波纹消除}
+
+在锁模激光器腔中，啁啾光栅的色散波纹（GDR）会导致
+脉冲质量下降、Kelly边带增强等问题。
+2025年的最新工作~\cite{ripple2025}提出了使用两个略微
+色散偏移的布拉格光栅消除腔内色散波纹的方案，
+通过在频谱上错开两个光栅的波纹峰谷实现自补偿效应。
+这一方案对高重复频率锁模激光器和啁啾脉冲放大器
+中的宽带平坦色散至关重要。
+
+\newpage
+
+% ===========================================================================
+% §6 衍生技术与相关进展
+% ===========================================================================
+\section{衍生技术与相关进展}
+
+\subsection{啁啾逆向耦合器（Contra-DC）}
+
+啁啾逆向耦合器通过光栅辅助两平行波导之间的相向耦合
+实现四端口add-drop操作，天然避免环行器需求。
+该概念最早由Shi等人~\cite{shi2013,shi2014}系统发展：
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item 2013年：全面理论+实验的逆向耦合器基础工作~\cite{shi2013}。
+  包含波导内和波导间耦合的CMT分析，演示了电调谐滤波器
+  （0.2~nm 3~dB带宽，24~dB消光比）。
+\item 2014年：基于线性啁啾逆向耦合器的可调谐纳米光子延迟线~\cite{shi2014}。
+  利用锥形肋宽实现线性啁啾（光栅周期恒定），
+  96~ps群延迟，$-$11~ps/nm负色散，仅0.015~mm$^2$。
+\end{itemize}
+
+2023年，研究者提出基于无序诱导自补偿效应的
+级联短光栅逆向耦合器方案~\cite{cascaded2023}，
+20阶级联实现$-$52.11~ps/nm色散，
+有效抑制群延迟波纹而不需要高精度切趾。
+
+\subsection{亚波长光栅啁啾布拉格光栅}
+
+亚波长光栅（Subwavelength Grating, SWG）波导的
+有效折射率可通过占空比在较大范围内调控，
+为啁啾光栅提供额外的设计自由度。
+Sun和Chen（McGill大学）在此方向做出了系统贡献：
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item 2020年~\cite{sun2020jlt}：基于10级步进啁啾SWG波导布拉格光栅的
+  离散可调光延迟线。在SOI平台上实现60~ps总延迟、
+  6.6~ps步进、41.7~nm带宽。采用3D FDTD+TMM联合设计。
+\item 2022年综述~\cite{sun2022}：全面总结SWG波导布拉格光栅
+  在微波光子学中的应用，包括啁啾、相移、采样和
+  偏振相关/无关结构。
+\end{itemize}
+
+SWG啁啾光栅的优势包括：
+(1) 等效折射率可通过占空比精确控制，制造容差高；
+(2) 设计自由度大——可独立设计周期啁啾和占空比啁啾；
+(3) 偏振工程灵活——通过SWG几何可独立控制TE和TM的有效折射率。
+
+\subsection{全可重构波导布拉格光栅}
+
+2018年，Yao和张（University of Ottawa）在
+\textit{Nature Communications}上发表了全可重构波导布拉格光栅
+~\cite{zhang2018}——一个被引168+次的突破性工作。
+该器件在SOI平台上通过热光电极阵列实现了光栅折射率调制分布的
+电编程控制。与具有固定折射率调制的传统光栅不同，
+该器件的光谱响应可通过软件定义实时改变。
+演示了三种可编程功能：
+
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+\item \textbf{时间微分器}：对输入光脉冲进行一阶时间微分；
+\item \textbf{微波时延器}：可编程的RF相移；
+\item \textbf{频率识别器}：对微波频率进行光学识别。
+\end{enumerate}
+
+这一概念对未来的可编程啁啾色散补偿器具有重要启示：
+热光电极阵列可以编程生成任意的啁啾分布和切趾轮廓，
+实现软件定义的色散管理。
+
+\subsection{硅基布拉格光栅谱设计教程与工具}
+
+2021年，Cheng和Chrostowski~\cite{cheng2021}在\textit{JLT}上发表的教程
+是该领域不可或缺的参考文献。该教程系统介绍了
+SOI集成布拉格光栅的全设计流程，涵盖：
+层剥离算法（Layer Peeling Algorithm）用于逆向设计；
+逆散射方法用于从目标光谱反推光栅结构；
+周期相位调制（Periodic Phase Modulation）用于等效切趾。
+
+此外，RSoft GratingMOD（Keysight）提供了基于CMT的
+商业仿真工具，支持多模光栅系统的前向和逆向分析。
+开源社区也开发了基于Python/NumPy的矢量化TMM工具，
+配合Lumerical MODE的$n_{\text{eff}}$数据库，
+实现秒级的逆向耦合器仿真。
+
+\newpage
+
+% ===========================================================================
+% §7 总结与展望
+% ===========================================================================
+\section{总结与展望}
+
+\subsection{当前技术水平总结}
+
+经过近四十年的发展，氮化硅波导啁啾布拉格光栅技术
+已从理论概念走向实验验证，并在多项性能指标上取得了
+数量级的飞跃。表~\ref{tab:summary}汇总了该领域的关键里程碑。
+
+\begin{table}[h]
+\centering
+\caption{SiN啁啾布拉格光栅领域关键里程碑}
+\label{tab:summary}
+\begin{tabular}{clp{8cm}}
+\toprule
+\textbf{年份} & \textbf{里程碑} & \textbf{关键贡献} \\
+\midrule
+1987 & Ouellette~\cite{ouellette1987} & 提出啁啾布拉格光栅色散抵消理论（被引775+） \\
+1994 & Hill, Eggleton等~\cite{hill1994,eggleton1994} & 啁啾光纤光栅色散补偿实验验证 \\
+2010 & Strain \& Sorel~\cite{strain2010} & 集成啁啾光栅色散控制（III-V平台） \\
+2014 & Shi et al.~\cite{shi2014} & 啁啾逆向耦合器延迟线（无环行器） \\
+2018 & Zhang \& Yao~\cite{zhang2018} & 全可重构波导布拉格光栅（\textit{Nat. Commun.}） \\
+2019 & Shtyrkova et al.~\cite{shtyrkova2019} & 完全集成Q开关锁模激光器（SiN） \\
+2020 & Du et al.~\cite{du2020} & 13.8~cm SiN螺旋CBG, 1440~ps GD（\textit{APL Photonics}） \\
+2021 & Cheng \& Chrostowski~\cite{cheng2021} & 硅集成Bragg光栅谱设计教程（\textit{JLT}） \\
+2021 & Cuyvers, Hermans, Vissers~\cite{cuyvers2021,hermans2021,vissers2021} & III-V/SiN异质集成锁模激光器（RF线宽1--31~Hz） \\
+2023 & Li et al.~\cite{li2023} & 2864~ps GD, 65.87~ns$\cdot$nm DBP（\textit{Opt. Express}） \\
+2023 & Liu \& Dai~\cite{liu2023advphoton} & 数字可调谐$\pm$63.77~ps/nm色散（\textit{Adv. Photonics}） \\
+2024 & Praena \& Carballar~\cite{praena2024} & ERI-TMM啁啾IBG设计方法论（\textit{Photonics}） \\
+2024 & Liu \& Dai~\cite{liu2024col} & TM型CMWG, 812.6~ps GD（\textit{Chin. Opt. Lett.}） \\
+2025 & Sinobad et al.~\cite{sinobad2025} & 164~nm BW, 62~fs脉冲压缩（硅芯片记录） \\
+2025 & Huang et al.~\cite{huang2025} & 2~$\mu$m波段80~nm宽带色散补偿 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{主要研究组分布}
+
+\begin{multicols}{2}
+\begin{itemize}[leftmargin=*,itemsep=1pt]
+\item \textbf{清华大学（陈宏伟组）}：SiN螺旋CBG、硅光子集成宽带色散芯片
+\item \textbf{浙江大学（戴道锌组）}：啁啾多模波导光栅、正/负色散可调谐、TM型CMWG
+\item \textbf{CFEL/DESY（K\"{a}rtner组）}：SiN ACG锁模激光器色散补偿、超宽带脉冲压缩
+\item \textbf{UBC（Chrostowski组）}：硅集成Bragg光栅教程、逆向耦合器
+\item \textbf{Ghent大学--IMEC}：III-V/SiN $\mu$TP异质集成锁模激光器
+\item \textbf{Eindhoven理工大学}：SiN扩展腔锁模激光二极管（Butt-Coupling）
+\item \textbf{MIT}：CMOS兼容集成Q开关锁模激光器
+\item \textbf{McGill大学（Chen组）}：SWG啁啾Bragg光栅
+\item \textbf{Glasgow大学（Sorel/Strain组）}：可调谐硅Bragg光栅色散控制
+\item \textbf{Ottawa大学（Yao组）}：可重构Bragg光栅、微波光子信号处理
+\item \textbf{Sevilla大学（Carballar组）}：ERI-TMM啁啾IBG设计方法论
+\end{itemize}
+\end{multicols}
+
+\subsection{未来研究方向}
+
+\begin{enumerate}[leftmargin=*,itemsep=3pt]
+
+\item \textbf{突破延迟-带宽积的基本限制}：
+当前已实现的延迟-带宽积最高为65.87~ns$\cdot$nm（Li 2023）。
+进一步突破需要：(i) SiN波导损耗降至$<$\SI{0.01}{dB/cm}量级以支持
+更长的光栅；(ii) 新型非线性啁啾分布设计以更高效利用光栅长度。
+
+\item \textbf{亚30~fs脉冲压缩}：
+从62~fs向亚30~fs迈进需要$>$300~nm的反射带宽。
+这要求啁啾率远大于当前水平，同时保持GDD平坦度（$<$\SI{10}{fs^2}波纹）。
+非均匀啁啾（如指数啁啾）和高阶色散工程是关键方向。
+
+\item \textbf{全集成锁模激光器}：
+III-V增益 + SiN色散管理 + 可饱和吸收体的单片集成仍是终极目标。
+微转移打印的良率提升、热管理和长期可靠性是需要解决的工程问题。
+
+\item \textbf{可见光与中红外扩展}：
+将啁啾光栅色散补偿拓展至可见光（如Ti:Sapphire的800~nm波段）
+和中红外（3--5~$\mu$m）将开辟新的应用领域。
+这需要针对不同波段优化SiN薄膜的透明窗口和波导设计。
+
+\item \textbf{AI辅助逆向设计}：
+深度学习代理模型（如神经网络拟合$n_{\text{eff}}(\lambda,W)$）
+可大幅加速ERI-TMM设计循环。
+拓扑优化与强化学习结合有望实现任意目标色散曲线的自动化设计。
+
+\item \textbf{非厄米与拓扑光栅}：
+宇称-时间（PT）对称和非厄米光子学为光栅色散工程
+提供了超越传统设计的维度。PT对称布拉格光栅可实现
+单向反射、增强色散和奇异点处的超灵敏色散调控。
+
+\item \textbf{系统级集成}：
+将啁啾光栅与微环谐振器阵列、高速调制器、光电探测器
+单片集成为完整的片上光信号处理或光计算系统。
+
+\end{enumerate}
+
+\subsection{结论}
+
+氮化硅波导啁啾布拉格光栅已经从一个30年前的理论构想发展为
+集成光子学中最活跃的研究前沿之一。超低损耗SiN波导与
+螺旋几何设计、多模架构和啁啾逆向耦合器的结合，
+使片上器件能够提供纳秒级群延迟和百纳米级带宽的色散管理。
+SiN切趾啁啾光栅与III-V异质集成锁模激光器的协同发展，
+正推动芯片级超快光源向实用化迈进。
+随着材料工艺、设计方法和系统集成的持续进步，
+氮化硅波导啁啾布拉格光栅有望在下一代光通信、微波光子学、
+量子光子学和超快科学中发挥关键作用。
+
+\newpage
+
+% ===========================================================================
+% 参考文献
+% ===========================================================================
+\begin{thebibliography}{99}
+
+% ---- 综述与教程 ----
+\bibitem{kaushal2018}
+S.~Kaushal, R.~Cheng, M.~Ma, A.~Mistry, M.~Burla, L.~Chrostowski, J.~Aza\~{n}a,
+``Optical signal processing based on silicon photonics waveguide Bragg gratings: review,''
+\textit{Front. Optoelectron.}, vol.~11, no.~2, pp.~163--188, 2018.
+
+\bibitem{cheng2021}
+R.~Cheng and L.~Chrostowski,
+``Spectral Design of Silicon Integrated Bragg Gratings: A Tutorial,''
+\textit{J. Lightwave Technol.}, vol.~39, no.~3, pp.~712--729, 2021.
+
+\bibitem{sun2022}
+H.~Sun et al.,
+``Integrated Subwavelength Grating Waveguide Bragg Gratings for Microwave Photonics,''
+\textit{J. Lightwave Technol.}, vol.~40, no.~20, pp.~6636--6649, 2022.
+
+\bibitem{saha2024}
+Saha, Brunetti, di~Toma, Armenise, Ciminelli,
+``Silicon Photonic Filters: A Pathway from Basics to Applications,''
+\textit{Adv. Photonics Res.}, vol.~5, no.~10, 2300343, 2024.
+
+\bibitem{singh2024}
+N.~Singh, J.~Lorenzen, M.~Sinobad et al.,
+``Integrated photonic frequency comb sources,''
+\textit{Nat. Photonics}, vol.~18, pp.~485--491, 2024.
+
+\bibitem{gardes2022}
+F.~Gardes et al.,
+``A Review of Capabilities and Scope for Hybrid Integration Offered by
+Silicon-Nitride-Based Photonic Integrated Circuits,''
+\textit{Sensors}, vol.~22, no.~11, 4227, 2022.
+
+\bibitem{praena2024}
+J.\'{A}.~Praena and A.~Carballar,
+``Chirped Integrated Bragg Grating Design,''
+\textit{Photonics}, vol.~11, no.~5, 476, 2024.
+
+\bibitem{hammood2021}
+M.~Hammood, L.~Chrostowski, N.~Jaeger,
+``Silicon Photonic Bragg Grating Devices,''
+in \textit{Silicon Photonics for High-Performance Computing and Beyond}, CRC Press, 2021.
+
+% ---- 理论基础 ----
+\bibitem{ouellette1987}
+F.~Ouellette,
+``Dispersion cancellation using linearly chirped Bragg grating filters in optical waveguides,''
+\textit{Opt. Lett.}, vol.~12, no.~10, pp.~847--849, 1987.
+
+\bibitem{strain2007}
+M.J.~Strain,
+``Integrated chirped Bragg gratings for dispersion control,''
+Ph.D. dissertation, Univ.~of Glasgow, 2007.
+
+\bibitem{strain2010}
+M.J.~Strain, M.~Sorel et al.,
+``Design and Fabrication of Integrated Chirped Bragg Gratings for On-Chip Dispersion Control,''
+\textit{IEEE J. Quantum Electron.}, vol.~46, no.~5, pp.~774--782, 2010.
+
+\bibitem{nippa2001}
+D.W.~Nippa,
+``A modal transfer matrix method for analysis of Bragg and long-period optical fiber gratings,''
+Ph.D. dissertation, Ohio State Univ., 2001.
+
+\bibitem{koufidis2022}
+Koufidis and McCall,
+``M\"{o}bius Transformation and Coupled-Wave Theory,''
+\textit{Phys. Rev. A}, vol.~106, 062213, 2022.
+
+\bibitem{lin2026}
+Lin et al.,
+``A modified transfer matrix method for designing two-mode chirped Bragg gratings,''
+\textit{Opt. Laser Technol.}, 2026 (forthcoming).
+
+% ---- 逆向耦合器 ----
+\bibitem{shi2013}
+W.~Shi, X.~Wang, C.~Lin, H.~Yun, Y.~Liu, T.~Baehr-Jones,
+M.~Hochberg, N.A.F.~Jaeger, L.~Chrostowski,
+``Silicon photonic grating-assisted, contra-directional couplers,''
+\textit{Opt. Express}, vol.~21, no.~3, pp.~3633--3650, 2013.
+
+\bibitem{shi2014}
+W.~Shi et al.,
+``Tunable nanophotonic delay lines using linearly chirped contradirectional couplers
+with uniform Bragg gratings,''
+\textit{Opt. Lett.}, vol.~39, no.~3, pp.~701--703, 2014.
+
+\bibitem{cascaded2023}
+``Grating-Assisted On-Chip Optical Dispersive Delay Lines with Suppressed Ripples
+Based on Disorder-Induced Self-Compensation Effect,''
+DTIC Tech.~Rep., 2023.
+
+% ---- 可调谐色散 ----
+\bibitem{klitis2019}
+C.~Klitis, M.~Sorel, M.J.~Strain,
+``Active On-Chip Dispersion Control Using a Tunable Silicon Bragg Grating,''
+\textit{Micromachines}, vol.~10, no.~9, 569, 2019.
+
+\bibitem{zhang2018}
+W.~Zhang and J.~Yao,
+``A fully reconfigurable waveguide Bragg grating for programmable photonic signal processing,''
+\textit{Nat. Commun.}, vol.~9, 1396, 2018.
+
+% ---- 色散补偿 ----
+\bibitem{du2020}
+J.~Du, X.~Fu, K.~Xu, W.~Chen, L.~Yang, J.E.~Bowers, S.~Chen,
+``Silicon nitride chirped spiral Bragg grating with large group delay,''
+\textit{APL Photonics}, vol.~5, no.~10, 101302, 2020.
+
+\bibitem{chen2021}
+Chen et al.,
+``Wideband large dispersion group delay chip based on silicon photonics integration (Invited),''
+\textit{红外与激光工程}, 2021.
+
+\bibitem{li2022}
+Li et al.,
+``Large group delay based on spiral tapered antisymmetric Bragg grating waveguide,''
+\textit{Proc. SPIE}, 2022.
+
+\bibitem{li2023}
+Li, Xu, Wang, Huang, Zhang, Zhang,
+``Large group delay and low loss optical delay line based on chirped waveguide Bragg gratings,''
+\textit{Opt. Express}, vol.~31, no.~3, pp.~4630, 2023.
+
+\bibitem{liu2024a}
+Liu et al.,
+``An Integrated Large Dispersion Optical Delay Line Based on Cladding-modulated Chirped Grating,''
+\textit{CLEO-PR 2024}.
+
+\bibitem{liu2023pr}
+S.~Liu, C.~Zhang, H.~Cao, S.~Hong, Z.~Yu, D.~Dai,
+``On-chip circulator-free chirped spiral multimode waveguide grating for dispersion management,''
+\textit{Photonics Res.}, 2023.
+
+\bibitem{liu2023contra}
+Liu et al.,
+``Integrated contra-directionally coupled chirped Bragg grating waveguide
+with a linear group delay spectrum,''
+\textit{Front. Optoelectron.}, 2023.
+
+% ---- 脉冲压缩 ----
+\bibitem{sinobad2025}
+M.~Sinobad, J.~Lorenzen, H.~Francis, M.A.~Gaafar,
+T.~Herr, N.~Singh, F.X.~K\"{a}rtner et al.,
+``Dispersion Compensating Silicon Nitride Waveguide Bragg Gratings for
+Ultrashort Pulse Compression,''
+\textit{IEEE Conference}, 2025.
+
+\bibitem{huang2025}
+Huang et al.,
+``Broadband on-chip dispersion compensation at 2-$\mu$m waveband using
+silicon nitride chirped Bragg gratings,''
+\textit{Opt. Express}, vol.~33, no.~13, pp.~26939, 2025.
+
+\bibitem{ripple2025}
+``Elimination of Dispersion Ripples in a Waveguide Cavity Using Two Slightly
+Dispersion-Shifted Bragg Gratings,''
+\textit{IEEE Conference}, Jun.~2025.
+
+% ---- 啁啾多模波导光栅 (戴道锌组) ----
+\bibitem{liu2023advphoton}
+S.~Liu, D.~Liu, Z.~Yu, L.~Liu, Y.~Shi, D.~Dai,
+``On-chip digitally-tunable positive/negative dispersion controller using
+bidirectional chirped multimode waveguide gratings,''
+\textit{Adv. Photonics}, 2023.
+
+\bibitem{liu2024col}
+S.~Liu, R.~Ma, W.~Zhao, Z.~Yu, D.~Dai,
+``Large-scale dispersion compensation with a TM-type chirped multimode waveguide grating,''
+\textit{Chin. Opt. Lett.}, vol.~22, no.~12, 121301, 2024.
+
+\bibitem{hong2025}
+S.~Hong, L.~Zhang, J.~Wu, Y.~Peng, L.~Lyu, Y.~Hu, Y.~Xie, D.~Dai,
+``Multimode-enabled silicon photonic delay lines: break the delay-density limit,''
+\textit{Light Sci. Appl.}, 2025.
+
+% ---- 亚波长光栅 ----
+\bibitem{sun2020jlt}
+H.~Sun and L.R.~Chen,
+``Integrated Discretely Tunable Optical Delay Line Based on Step-Chirped
+Subwavelength Grating Waveguide Bragg Gratings,''
+\textit{J. Lightwave Technol.}, vol.~38, no.~19, pp.~5470--5477, 2020.
+
+% ---- 锁模激光器 ----
+\bibitem{callahan2016}
+P.T.~Callahan, Purnawirman et al.,
+``Double-chirped Bragg gratings in a silicon nitride waveguide,''
+\textit{CLEO 2016}, paper SF1E.7, 2016.
+
+\bibitem{shtyrkova2019}
+K.~Shtyrkova, P.T.~Callahan et al.,
+``Integrated CMOS-compatible Q-switched mode-locked lasers at 1900nm
+with an on-chip artificial saturable absorber,''
+\textit{Opt. Express}, vol.~27, no.~3, pp.~3542--3555, 2019.
+
+\bibitem{sinobad2023cleo}
+M.~Sinobad, J.~Lorenzen, H.~Francis, M.A.~Gaafar,
+T.~Herr, N.~Singh, F.X.~K\"{a}rtner et al.,
+``Silicon Nitride Apodized Chirped Gratings in the Short-wave Infrared Band,''
+\textit{CLEO 2023}, paper JW2A.94, 2023.
+
+\bibitem{sinobad2023cleoeu}
+M.~Sinobad et al.,
+``Apodized Chirped Bragg Gratings in a Silicon Nitride-on-Insulator Platform
+at Short-Wave Infrared Wavelengths,''
+\textit{CLEO/Europe-EQEC 2023}, paper CK\_P\_8, 2023.
+
+\bibitem{cuyvers2021}
+S.~Cuyvers et al.,
+``Low Noise Heterogeneous III-V-on-Silicon-Nitride Mode-Locked Comb Laser,''
+\textit{Laser Photonics Rev.}, vol.~15, 2000485, 2021.
+
+\bibitem{hermans2021}
+A.~Hermans et al.,
+``High-pulse-energy III-V-on-silicon-nitride mode-locked laser,''
+\textit{APL Photonics}, vol.~6, 096102, 2021.
+
+\bibitem{vissers2021}
+E.~Vissers et al.,
+``Hybrid integrated mode-locked laser diodes with a silicon nitride extended cavity,''
+\textit{Opt. Express}, vol.~29, no.~10, pp.~15013--15022, 2021.
+
+% ---- 早期先驱 ----
+\bibitem{hill1994}
+K.O.~Hill, F.~Bilodeau, B.~Malo, T.~Kitagawa,
+S.~Th\'{e}riault, D.C.~Johnson, J.~Albert,
+``Chirped in-fiber Bragg gratings for compensation of optical fiber dispersion,''
+\textit{Opt. Lett.}, vol.~19, pp.~1314--1316, 1994.
+
+\bibitem{eggleton1994}
+B.J.~Eggleton, P.A.~Krug, L.~Poladian,
+``Experimental demonstration of compression of dispersed optical pulses
+by reflection from self-chirped optical fibre Bragg gratings,''
+\textit{Opt. Lett.}, vol.~19, pp.~877--879, 1994.
+
+\bibitem{ouellette1995}
+F.~Ouellette, P.A.~Krug, T.~Stephens, G.~Dhosi, B.J.~Eggleton,
+``Broadband and WDM dispersion compensation using chirped sampled fibre Bragg gratings,''
+\textit{Electron. Lett.}, vol.~31, pp.~899--901, 1995.
+
+\bibitem{loh1995}
+W.H.~Loh, R.I.~Laming, X.~Gu, M.N.~Zervas,
+M.J.~Cole, T.~Widdowson, A.D.~Ellis,
+``10 cm chirped fibre Bragg grating for dispersion compensation at 10 Gbit/s
+over 400 km of non-dispersion shifted fibre,''
+\textit{Electron. Lett.}, vol.~31, 1995.
+
+\bibitem{eggleton1995}
+B.J.~Eggleton, K.A.~Ahmed, F.~Ouellette, P.A.~Krug, H.-F.~Liu,
+``Recompression of pulses broadened by transmission through 10 km of
+non-dispersion-shifted fiber at 1.55 $\mu$m using 40-mm-long optical fiber
+Bragg gratings with tunable chirp and central wavelength,''
+\textit{IEEE Photon. Technol. Lett.}, vol.~7, pp.~494--496, 1995.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,1246 @@
+% ============================================================
+%  九字腔光放大环形镜 (NALM) 传输矩阵建模
+%  Figure-9 Cavity Nonlinear Amplifying Loop Mirror
+%  Transfer Matrix Model with Dispersion, Loss, Gain & Kerr Nonlinearity
+% ============================================================
+\documentclass[11pt,a4paper]{ctexart}
+
+% ---- Packages ----
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.8cm, right=2.8cm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{cleveref}
+\usepackage{mathtools}
+\usepackage{xcolor}
+
+% ---- TikZ libraries ----
+\usetikzlibrary{shapes,arrows,positioning,calc,decorations.pathmorphing,decorations.markings}
+
+% ---- Metadata ----
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=blue!40!black,
+  urlcolor=blue!60!black
+}
+
+% ---- Title ----
+\title{\textbf{九字腔光放大环形镜传输矩阵建模}\\[0.5em]
+       \large 考虑色散、损耗、增益与非线性的全腔分析}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent 本文建立了九字腔（Figure-9 cavity）光放大环形镜（Nonlinear Amplifying Loop Mirror, NALM）的传输矩阵理论模型。
+模型系统性地考虑了光纤的群速度色散（$\beta_2$、$\beta_3$）、分布式损耗（$\alpha$）、增益介质的饱和放大（$g_0$、$P_{\text{sat}}$）
+以及克尔非线性效应（$\gamma$）。
+基于 $2\times2$ 琼斯/散射矩阵形式，推导了各元件的传输矩阵，构建了全腔往返传输算子，并给出了稳态自洽解的迭代求解框架。
+该模型可用于预测锁模阈值、脉冲演化、输出特性及腔参数优化。
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{引言}
+% ============================================================
+
+九字腔（Figure-9 cavity）是一种基于非线性放大环形镜（NALM）的锁模光纤激光器结构，
+因其腔型拓扑形似数字"9"而得名\cite{duling1991all}。
+其核心元件是一个含增益光纤的非对称 Sagnac 干涉环，利用反向传输光场之间的
+非线性相位差实现强度相关的反射率，从而起到等效可饱和吸收体（Artificial Saturable Absorber）的作用。
+
+与传统 SESAM（Semiconductor Saturable Absorber Mirror）锁模相比，
+NALM 具有损伤阈值高、响应速度极快（飞秒量级）、工作波长灵活、
+长期稳定性好等显著优势\cite{haus1991coupled,fermann2013ultrafast}，
+已成为超快光纤激光器的重要技术路线。
+
+传输矩阵（Transfer Matrix）方法是分析光学腔的经典工具\cite{jones1941new}。
+对于包含色散、损耗、增益和非线性的九字腔，
+该方法能够以矩阵乘积的形式表征各元件的线性传输特性，
+并在此基础上引入非线性相位修正，从而建立起完整的往返传输模型。
+
+本文的结构如下：
+\Cref{sec:structure} 描述九字腔的物理结构与工作机理；
+\Cref{sec:matrices} 推导各元件的 $2\times2$ 传输矩阵；
+\Cref{sec:nalm} 建立 NALM 的反射/透射模型；
+\Cref{sec:roundtrip} 构建全腔往返矩阵与色散-非线性耦合传输方程；
+\Cref{sec:steady} 给出稳态自洽解的迭代求解算法；
+\Cref{sec:numerical} 讨论数值实现要点与典型参数；
+\Cref{sec:conclusion} 总结全文。
+
+% ============================================================
+\section{九字腔结构与工作机理}
+\label{sec:structure}
+% ============================================================
+
+\subsection{腔型拓扑}
+
+九字腔由以下核心元件构成（见\cref{fig:cavity}）：
+
+\begin{itemize}
+  \item 一个 $2\times2$ 光纤耦合器（Coupler），功率分束比为 $\kappa : (1-\kappa)$；
+  \item 一段光纤环（Loop），两端连接至耦合器的端口 1 和端口 2；
+  \item 一段增益光纤（Active Fiber），非对称地放置在环内，靠近端口 1；
+  \item 一段线性臂（Linear Arm），连接至耦合器的端口 3；
+  \item 一个反射器（Reflector，如光纤布拉格光栅 FBG 或 Sagnac 反射镜），位于线性臂末端；
+  \item 端口 4 作为输出端（Output Port）；
+  \item 可选的光隔离器（Isolator）和带通滤波器（Filter）放置在线性臂中。
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  scale=1.0,
+  component/.style={draw, fill=blue!10, minimum width=1.2cm, minimum height=0.7cm, rounded corners=2pt, align=center},
+  fiber/.style={draw=red!60!black, line width=1.2pt},
+  arrow/.style={->, >=stealth, line width=1pt},
+  label/.style={font=\footnotesize}
+]
+
+% Coordinate definitions
+\def\cx{0}
+\def\cy{0}
+\def\R{2.0}   % Loop radius
+\def\arm{3.5} % Linear arm length
+
+% Coupler center
+\coordinate (C) at (\cx,\cy);
+
+% Loop path (clockwise from port 1)
+\coordinate (P1) at ($(C)+(0,\R)$);        % Port 1 (top)
+\coordinate (P2) at ($(C)+(\R,0)$);         % Port 2 (right)
+\coordinate (P3) at ($(C)+(-\R,0)$);        % Port 3 (left)
+\coordinate (P4) at ($(C)+(0,-\R)$);        % Port 4 (bottom)
+
+% Gain fiber position (near port 1 in CW direction)
+\coordinate (G1) at ($(C)+(40:\R)$);        % Gain start (CW from P1)
+\coordinate (G2) at ($(C)+(80:\R)$);        % Gain end
+
+% Linear arm endpoints
+\coordinate (Lend) at ($(P3)-(0,\arm)$);
+\coordinate (Rmirror) at ($(Lend)-(0,0.5)$);
+
+% Output
+\coordinate (Oend) at ($(P4)-(0,1.0)$);
+
+% ---- Draw fibers ----
+% Loop
+\draw[fiber] (P1) arc(90:0:\R) -- (P2);
+\draw[fiber] (P2) arc(0:-90:\R) -- (P4);
+\draw[fiber] (P4) arc(-90:-180:\R) -- (P3);
+\draw[fiber] (P3) arc(180:90:\R) -- (P1);
+
+% Linear arm
+\draw[fiber] (P3) -- (Lend);
+
+% Output fiber
+\draw[fiber] (P4) -- (Oend);
+
+% ---- Draw components ----
+% Coupler
+\node[component, fill=gray!20] at (C) {耦合器\\$\kappa$};
+
+% Gain fiber
+\node[component, fill=green!20, minimum width=1.0cm] at ($(C)+(60:1.35*\R)$) {增益\\光纤};
+
+% Reflector
+\node[component, fill=orange!20] at (Rmirror) {反射镜};
+
+% Filter (in linear arm)
+\node[component, fill=yellow!15, minimum width=0.9cm] at ($(P3)!0.5!(Lend)$) {滤波器};
+
+% Isolator
+\node[component, fill=cyan!15, minimum width=0.9cm] at ($(P3)!0.35!(Lend)$) {隔离器};
+
+% ---- Labels ----
+\node[label, above=0.15cm of P1] {Port 1};
+\node[label, right=0.15cm of P2] {Port 2};
+\node[label, left=0.15cm of P3] {Port 3};
+\node[label, below=0.15cm of P4] {Port 4};
+
+\node[label, below=0.15cm of Oend] {输出};
+
+% ---- CW/CCW arrows on loop ----
+\draw[arrow, blue!60!black] ($(C)+(25:1.15*\R)$) arc(25:65:1.15*\R) node[midway, right] {\footnotesize CW};
+\draw[arrow, red!60!black] ($(C)+(115:1.15*\R)$) arc(115:155:1.15*\R) node[midway, left] {\footnotesize CCW};
+
+% ---- Annotations ----
+\node[label, right=0.3cm of G2, align=left, font=\scriptsize] {非对称\\放置};
+\draw[->, thin, dashed] (1.8,0.5) -- (2.6,0.8);
+
+\end{tikzpicture}
+\caption{九字腔结构示意图。$2\times2$ 耦合器连接光纤环（含非对称增益光纤）与线性臂。
+环中顺时针（CW）与逆时针（CCW）方向的光场经过不同的非线性演化路径，
+在耦合器处干涉形成强度相关的反射率。}
+\label{fig:cavity}
+\end{figure}
+
+\subsection{非线性放大环形镜 (NALM) 工作原理}
+
+NALM 的核心物理是：增益光纤放置在环内的非对称位置，
+使得 CW 与 CCW 两个方向上传输的光脉冲在不同时刻经过增益介质，
+由此产生幅度和相位的差分演化，最终在耦合器处产生与强度相关的干涉结果。
+
+具体而言，设耦合器为 $\kappa : (1-\kappa)$ 分束：
+
+\begin{enumerate}
+  \item 来自线性臂的光场 $E_{\text{in}}$ 从端口 3 进入，被耦合器分为两路：
+        \begin{align}
+          E_{\text{CW}}^{(0)} &= \sqrt{\kappa}\, E_{\text{in}},\\[2pt]
+          E_{\text{CCW}}^{(0)} &= i\sqrt{1-\kappa}\, E_{\text{in}}.
+        \end{align}
+  \item CW 分量先经过短段无源光纤、再经过增益光纤、最后经长段无源光纤到达端口 2；
+  \item CCW 分量则先经过长段无源光纤、再经过增益光纤、最后经短段无源光纤到达端口 1；
+  \item 两束光在耦合器处重新相遇并干涉，反射回端口 3（反射分量）和端口 4（透射/输出分量）。
+\end{enumerate}
+
+由于增益光纤的非对称放置，两路光在增益光纤入口处的脉冲能量不同，
+经过增益饱和和非线性相位调制后的演化也不同。
+最终的相位差 $\Delta\phi = \phi_{\text{CW}} - \phi_{\text{CCW}}$ 包含：
+
+\begin{itemize}
+  \item \textbf{线性相位差} $\Delta\phi_L$：由光纤长度不对称、耦合器附加相位等引起；
+  \item \textbf{非线性相位差} $\Delta\phi_{\text{NL}}$：正比于两路脉冲峰值功率之差，
+        $\Delta\phi_{\text{NL}} \propto \gamma L_{\text{eff}} (P_{\text{CW}} - P_{\text{CCW}})$；
+  \item \textbf{增益诱导相位差}：增益饱和导致的幅度演化又通过 SPM 间接影响相位。
+\end{itemize}
+
+反射率的一般表达式为\cite{doran1988nonlinear}：
+\begin{equation}
+  R = 1 - 2\kappa(1-\kappa)\bigl[1 + \cos(\Delta\phi)\bigr].
+  \label{eq:nalm_reflectivity}
+\end{equation}
+
+在低功率下，若线性相位偏置使 $\cos(\Delta\phi_L) \approx -1$，则 $R \to 1$（高反射）；
+随着功率增加，非线性相位差使 $\Delta\phi$ 偏离该偏置点，反射率降低，
+形成等效的可饱和吸收效应。
+
+% ============================================================
+\section{传输矩阵形式理论}
+\label{sec:matrices}
+% ============================================================
+
+\subsection{基本约定}
+
+考虑沿 $z$ 方向传播的单模光纤中的光场，
+其正向（$+z$）和反向（$-z$）传播分量的复振幅记为 $E^+(z)$ 和 $E^-(z)$。
+定义二分量列向量：
+\begin{equation}
+  \mathbf{E}(z) = \begin{pmatrix} E^+(z) \\ E^-(z) \end{pmatrix}.
+  \label{eq:field_vector}
+\end{equation}
+
+一个两端口的线性光学元件的传输矩阵 $\mathbf{M}$ 满足：
+\begin{equation}
+  \mathbf{E}_{\text{out}} = \mathbf{M}\, \mathbf{E}_{\text{in}}.
+  \label{eq:transfer_relation}
+\end{equation}
+
+在频域中，光场 $E^\pm(z, \omega)$ 依赖于角频率偏移 $\Omega = \omega - \omega_0$，
+其中 $\omega_0$ 为载波角频率。
+各频谱分量独立传输（线性介质的叠加原理），传输矩阵是频率的函数 $\mathbf{M}(\Omega)$。
+
+\subsection{无源光纤段的传输矩阵}
+
+长度为 $L$ 的无源（被动）光纤段，考虑色散和损耗，
+其频率域传输特性为：
+
+\begin{equation}
+  \mathbf{M}_{\text{fiber}}(\Omega) =
+  \begin{pmatrix}
+    e^{i\beta(\omega_0+\Omega)L - \frac{\alpha}{2}L} & 0 \\[4pt]
+    0 & e^{i\beta(\omega_0+\Omega)L - \frac{\alpha}{2}L}
+  \end{pmatrix},
+  \label{eq:M_fiber}
+\end{equation}
+
+其中：
+\begin{itemize}
+  \item $\beta(\omega)$ 为传播常数，在 $\omega_0$ 附近作泰勒展开：
+        \begin{equation}
+          \beta(\omega_0 + \Omega) = \beta_0 + \beta_1\Omega + \frac{\beta_2}{2}\Omega^2 + \frac{\beta_3}{6}\Omega^3 + \cdots
+          \label{eq:beta_expansion}
+        \end{equation}
+  \item $\beta_n = d^n\beta/d\omega^n|_{\omega_0}$ 为 $n$ 阶色散系数；
+  \item $\beta_1 = 1/v_g$ 为群延迟的倒数；
+  \item $\beta_2$ 为群速度色散（GVD），$\beta_2 < 0$ 为反常色散区；
+  \item $\beta_3$ 为三阶色散（TOD）；
+  \item $\alpha$ 为功率损耗系数（单位：m$^{-1}$），与常用 dB/km 的关系为
+        $\alpha_{[\text{dB/km}]} \approx 4.343 \times 10^3 \cdot \alpha_{[\text{m}^{-1}]}$。
+\end{itemize}
+
+对于正向和反向传播，时域的色散算子作用是对称的：
+\begin{equation}
+  \hat{D}(i\partial_t) = i\beta_0 - \frac{\alpha}{2}
+  + i\beta_1 (i\partial_t)
+  - \frac{i\beta_2}{2}(i\partial_t)^2
+  - \frac{i\beta_3}{6}(i\partial_t)^3 + \cdots
+  \label{eq:dispersion_operator}
+\end{equation}
+
+\subsection{增益光纤段的传输矩阵}
+
+增益光纤在提供放大的同时具有与无源光纤相同的色散和损耗特性。
+其关键区别在于增益系数 $g$ 及其饱和行为。
+
+在频域中，增益光纤的传输矩阵在形式上与无源光纤相同，
+但传播常数为复数：
+\begin{equation}
+  \mathbf{M}_{\text{gain}}(\Omega, P) =
+  \begin{pmatrix}
+    e^{i\beta(\omega_0+\Omega)L_g - \frac{\alpha}{2}L_g + \frac{g(P)}{2}L_g} & 0 \\[4pt]
+    0 & e^{i\beta(\omega_0+\Omega)L_g - \frac{\alpha}{2}L_g + \frac{g(P)}{2}L_g}
+  \end{pmatrix},
+  \label{eq:M_gain}
+\end{equation}
+
+其中 $L_g$ 为增益光纤长度，$g(P)$ 为功率相关的增益系数。
+
+\subsubsection{增益饱和模型}
+
+采用均匀加宽的两能级增益饱和模型：
+\begin{equation}
+  g(P) = \frac{g_0}{1 + P / P_{\text{sat}}},
+  \label{eq:gain_saturation}
+\end{equation}
+
+其中：
+\begin{itemize}
+  \item $g_0$ 为小信号增益系数（单位：m$^{-1}$）；
+  \item $P_{\text{sat}}$ 为饱和功率（单位：W）；
+  \item $P = |E|^2$ 为瞬时功率。
+\end{itemize}
+
+对于脉冲传输，由于脉冲宽度通常远小于增益介质的恢复时间
+（$\tau_p \ll \tau_g \sim \text{ms}$ 对于稀土掺杂光纤），
+增益饱和主要取决于脉冲能量而非瞬时功率\cite{agrawal2019nonlinear}。
+此时可使用脉冲能量饱和模型：
+\begin{equation}
+  g(E_p) = \frac{g_0}{1 + E_p / E_{\text{sat}}},
+  \label{eq:gain_energy_sat}
+\end{equation}
+
+其中 $E_p = \int |E(t)|^2 dt$ 为脉冲能量，$E_{\text{sat}}$ 为饱和能量。
+
+有效增益长度为：
+\begin{equation}
+  L_{\text{eff}}^{(g)} = \frac{1 - e^{-(g_0 - \alpha)L_g}}{g_0 - \alpha}.
+  \label{eq:Leff_gain}
+\end{equation}
+
+\subsubsection{增益色散（有限增益带宽）}
+
+稀土掺杂光纤的增益具有有限的带宽，可用 Lorentzian 线型描述：
+\begin{equation}
+  g(\omega) = \frac{g_0}{1 + (\Omega / \Omega_g)^2},
+  \label{eq:gain_dispersion}
+\end{equation}
+
+其中 $\Omega_g$ 为增益带宽（HWHM）。
+在时域中，这对应于一个卷积算子，可通过频域滤波或引入增益色散项来处理：
+\begin{equation}
+  \hat{G}(\omega) \approx \frac{g_0}{1 + (\Omega/\Omega_g)^2}
+  \approx g_0\left(1 - \frac{\Omega^2}{\Omega_g^2} + \cdots\right).
+  \label{eq:gain_parabolic}
+\end{equation}
+
+二阶增益色散 $g_0/\Omega_g^2$ 与材料色散 $\beta_2$ 共同影响脉冲整形。
+
+\subsection{$2\times2$ 光纤耦合器}
+
+理想的 $2\times2$ 光纤耦合器的散射矩阵为：
+\begin{equation}
+  \mathbf{M}_{\text{coupler}} =
+  \begin{pmatrix}
+    \sqrt{1-\kappa} & i\sqrt{\kappa} \\[2pt]
+    i\sqrt{\kappa}  & \sqrt{1-\kappa}
+  \end{pmatrix},
+  \label{eq:M_coupler}
+\end{equation}
+
+其中 $\kappa \in [0,1]$ 为功率耦合比。
+该矩阵满足幺正性（$\mathbf{M}^\dagger \mathbf{M} = \mathbf{I}$），
+对应无损耗耦合。
+$i$ 因子的出现表示跨越耦合产生的 $\pi/2$ 相位跳变。
+
+在某些分析中，也可采用以下等价形式：
+\begin{equation}
+  \mathbf{M}_{\text{coupler}} =
+  \begin{pmatrix}
+    \cos\theta & i\sin\theta \\
+    i\sin\theta  & \cos\theta
+  \end{pmatrix},
+  \quad \theta = \arcsin(\sqrt{\kappa}).
+  \label{eq:M_coupler_angle}
+\end{equation}
+
+\subsection{反射器（FBG / 反射镜）}
+
+理想反射器的传输矩阵为：
+\begin{equation}
+  \mathbf{M}_{\text{mirror}} =
+  \begin{pmatrix}
+    r & 0 \\
+    0 & r
+  \end{pmatrix},
+  \label{eq:M_mirror}
+\end{equation}
+
+其中 $r \in [0,1]$ 为振幅反射系数，功率反射率 $R = r^2$。
+
+对于光纤布拉格光栅（FBG），$r$ 是频率的函数：
+\begin{equation}
+  r(\Omega) = \frac{i\kappa_{\text{FBG}} \sinh(\gamma L_{\text{FBG}})}
+                    {\gamma \cosh(\gamma L_{\text{FBG}}) - i\delta \sinh(\gamma L_{\text{FBG}})},
+  \label{eq:r_FBG}
+\end{equation}
+
+其中 $\kappa_{\text{FBG}}$ 为光栅耦合系数，$\delta$ 为频率失谐量，
+$\gamma = \sqrt{\kappa_{\text{FBG}}^2 - \delta^2}$。
+
+\subsection{其他元件}
+
+\begin{itemize}
+  \item \textbf{光隔离器}：单向传输矩阵
+        $\mathbf{M}_{\text{iso}} = \operatorname{diag}(e^{i\phi_{\text{iso}}}, 0)$。
+  \item \textbf{带通滤波器}：频域传输函数
+        $T(\Omega) = \exp(-\Omega^2 / 2\Omega_f^2)$，$\Omega_f$ 为滤波器带宽。
+  \item \textbf{相位偏置器}：差分相位矩阵
+        $\mathbf{M}_{\text{bias}} = \operatorname{diag}(e^{i\phi_b}, 1)$，
+        用于在 NALM 中引入线性相位偏置。
+\end{itemize}
+
+% ============================================================
+\section{NALM 的传输矩阵分析}
+\label{sec:nalm}
+% ============================================================
+
+\subsection{NALM 的散射矩阵描述}
+
+考虑由耦合器端口 1--2 连接的光纤环 + 端口 3--4 连接的外腔构成的 NALM
+（参见\cref{fig:nalm_detail}）。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  scale=1.0,
+  fiber/.style={draw=red!60!black, line width=1.2pt},
+  arrow/.style={->, >=stealth, line width=1pt},
+  block/.style={draw, fill=gray!10, minimum width=1cm, minimum height=1.2cm, align=center}
+]
+
+% Coupler
+\node[block] (C) at (0,0) {耦合器\\$\kappa$};
+
+% Port labels
+\node[above=0.3cm] at (C.north) {1};
+\node[right=0.3cm] at (C.east) {2};
+\node[left=0.3cm] at (C.west) {3};
+\node[below=0.3cm] at (C.south) {4};
+
+% Loop (ports 1-2)
+\draw[fiber] (C.north) -- ++(0,1.5) node[midway, right] {$E_1^+$} ;
+\draw[fiber] ++(0,1.5) -- ++(4,0);
+\draw[fiber] ++(4,0) -- ++(0,-1.5) node[midway, right] {$E_2^-$};
+
+% Loop components
+\node[block, fill=green!15, minimum height=0.7cm] (G) at (2,1.8) {增益光纤};
+\node[block, fill=blue!10, minimum height=0.7cm] (F1) at (0.5,1.8) {光纤段};
+\node[block, fill=blue!10, minimum height=0.7cm] (F2) at (3.5,1.8) {光纤段};
+
+% Port 3 (linear arm in)
+\draw[fiber, arrow] ($(C.west)+(-2.2,0)$) -- (C.west) node[midway, above] {$E_{\text{in}}$};
+
+% Port 4 (output)
+\draw[fiber, arrow] (C.south) -- ++(0,-1.5) node[midway, right] {$E_{\text{out}}$};
+
+% Field labels
+\node[below=0.2cm] at (C.north) {$E_1^+$};
+\node[above=0.2cm] at (C.north) {$E_1^-$};
+\node[right=0.2cm] at (C.east) {$E_2^+$};
+\node[below=0.2cm] at (C.east) {$E_2^-$};
+
+\end{tikzpicture}
+\caption{NALM 散射矩阵端口定义。$E_i^\pm$ 表示端口 $i$ 的输入（$+$）和输出（$-$）场。
+端口 1--2 通过光纤环连接，端口 3 为输入，端口 4 为输出。}
+\label{fig:nalm_detail}
+\end{figure}
+
+按照散射矩阵的形式，$2\times2$ 耦合器连接四端口：
+\begin{equation}
+  \begin{pmatrix} E_1^- \\ E_2^- \\ E_3^- \\ E_4^- \end{pmatrix}
+  = \begin{pmatrix}
+    0      & 0      & \sqrt{1-\kappa} & i\sqrt{\kappa} \\
+    0      & 0      & i\sqrt{\kappa}  & \sqrt{1-\kappa} \\
+    \sqrt{1-\kappa} & i\sqrt{\kappa}  & 0 & 0 \\
+    i\sqrt{\kappa}  & \sqrt{1-\kappa} & 0 & 0
+  \end{pmatrix}
+  \begin{pmatrix} E_1^+ \\ E_2^+ \\ E_3^+ \\ E_4^+ \end{pmatrix}.
+  \label{eq:coupler_4port}
+\end{equation}
+
+\subsection{环内传输}
+
+端口 1 和端口 2 之间通过光纤环相连。
+设 CW 方向（从端口 1 到端口 2）的总传输系数为 $T_{\text{CW}}$，
+CCW 方向（从端口 2 到端口 1）的总传输系数为 $T_{\text{CCW}}$：
+\begin{align}
+  E_2^+ &= T_{\text{CW}} \, E_1^-, \label{eq:loop_CW} \\
+  E_1^+ &= T_{\text{CCW}} \, E_2^-. \label{eq:loop_CCW}
+\end{align}
+
+环由三段构成：短无源段 $L_1$、增益段 $L_g$、长无源段 $L_2$。
+CW 路径为 $L_1 \to L_g \to L_2$，CCW 路径为 $L_2 \to L_g \to L_1$。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  fiber/.style={draw=red!60!black, line width=1.2pt},
+  block/.style={draw, minimum height=0.7cm, align=center},
+]
+
+\draw[fiber] (0,1) -- (6,1);
+\draw[fiber] (0,-1) -- (6,-1);
+
+% Ports
+\draw[fiber] (0,1) -- (0,-1);
+\draw[fiber] (6,1) -- (6,-1);
+
+\node at (0,0) {Port 1};
+\node at (6,0) {Port 2};
+
+% Segments
+\node[block, fill=blue!10, minimum width=1.5cm] at (1,1) {$L_1$\\无源};
+\node[block, fill=green!15, minimum width=1.5cm] at (3,1) {$L_g$\\增益};
+\node[block, fill=blue!10, minimum width=1.5cm] at (5,1) {$L_2$\\无源};
+
+\node[block, fill=blue!10, minimum width=1.5cm] at (5,-1) {$L_2$\\无源};
+\node[block, fill=green!15, minimum width=1.5cm] at (3,-1) {$L_g$\\增益};
+\node[block, fill=blue!10, minimum width=1.5cm] at (1,-1) {$L_1$\\无源};
+
+% CW path
+\draw[->, >=stealth, blue!60!black, very thick] (0.5,0.5) -- (4.5,0.5);
+\node[blue!60!black] at (2.5,0.8) {CW};
+
+% CCW path
+\draw[->, >=stealth, red!60!black, very thick] (5.5,-0.5) -- (1.5,-0.5);
+\node[red!60!black] at (3.5,-0.8) {CCW};
+
+\end{tikzpicture}
+\caption{环内 CW/CCW 路径示意。增益段非对称放置（靠近 Port 1），
+CW 先增益后长传输，CCW 先长传输后增益。}
+\label{fig:loop_asymmetry}
+\end{figure}
+
+环内传输系数为：
+\begin{align}
+  T_{\text{CW}}(\Omega) &= \exp\!\Big[i\beta(\omega_0+\Omega)(L_1+L_2+L_g)
+                          - \frac{\alpha}{2}(L_1+L_2+L_g)
+                          + \frac{g}{2}L_g\Big], \label{eq:TCW} \\[4pt]
+  T_{\text{CCW}}(\Omega) &= T_{\text{CW}}(\Omega).
+  \label{eq:TCCW}
+\end{align}
+
+在\textbf{线性无增益饱和}情况下，$T_{\text{CW}} = T_{\text{CCW}}$，
+环是互易的。但当考虑增益饱和和非线性效应时，两者不再相等。
+
+\subsection{非线性相位修正}
+
+克尔非线性效应通过自相位调制（SPM）和交叉相位调制（XPM）引入功率相关的相位偏移。
+对于反向传输的 CW 和 CCW 脉冲，XPM 效应可以忽略（脉冲在环内大部分时间不重叠），
+仅考虑 SPM。
+
+CW 方向的非线性相移（在增益段入口和出口经历不同的功率演化）：
+\begin{equation}
+  \phi_{\text{NL}}^{\text{CW}} = \gamma \int_{0}^{L_{\text{loop}}}
+  |E_{\text{CW}}(z)|^2 \, dz,
+  \label{eq:phi_NL_CW}
+\end{equation}
+
+其中 $\gamma = n_2 \omega_0 / (c A_{\text{eff}})$ 为非线性系数，
+$n_2$ 为非线性折射率，$A_{\text{eff}}$ 为有效模场面积。
+
+对于 CW 和 CCW 路径，功率演化的差异来自增益段的非对称位置。
+考虑分段积分：
+
+\begin{align}
+  \phi_{\text{NL}}^{\text{CW}} &= \gamma \Big[
+    P_{\text{CW}}^{(0)} L_1
+    + P_{\text{CW}}^{(0)} e^{gL_g - \alpha L_g} L_2
+    + P_{\text{CW}}^{(0)} \frac{e^{gL_g - \alpha L_g} - 1}{g - \alpha}
+  \Big], \\[4pt]
+  \phi_{\text{NL}}^{\text{CCW}} &= \gamma \Big[
+    P_{\text{CCW}}^{(0)} L_2
+    + P_{\text{CCW}}^{(0)} e^{gL_g - \alpha L_g} L_1
+    + P_{\text{CCW}}^{(0)} \frac{e^{gL_g - \alpha L_g} - 1}{g - \alpha}
+  \Big],
+\end{align}
+
+其中 $P_{\text{CW}}^{(0)} = \kappa P_{\text{in}}$，
+$P_{\text{CCW}}^{(0)} = (1-\kappa) P_{\text{in}}$ 为各自在环入口处的功率。
+
+关键的非线性相位差为：
+\begin{equation}
+  \Delta\phi_{\text{NL}} = \phi_{\text{NL}}^{\text{CW}} - \phi_{\text{NL}}^{\text{CCW}}
+  = \gamma P_{\text{in}} \Big[\kappa - (1-\kappa)\Big]
+    \Big[ L_1 - L_2 + (L_2 - L_1) e^{gL_g - \alpha L_g} \Big].
+  \label{eq:delta_phi_NL}
+\end{equation}
+
+定义非对称参数 $\Delta L = L_2 - L_1$，则：
+\begin{equation}
+  \boxed{
+  \Delta\phi_{\text{NL}} = \gamma P_{\text{in}} (2\kappa - 1) \Delta L
+    \bigl(e^{gL_g - \alpha L_g} - 1\bigr)
+  }.
+  \label{eq:delta_phi_NL_simple}
+\end{equation}
+
+\Cref{eq:delta_phi_NL_simple} 揭示了几个关键特征：
+
+\begin{enumerate}
+  \item $\Delta\phi_{\text{NL}} \propto \gamma P_{\text{in}}$：非线性相移与输入功率成正比；
+  \item $\Delta\phi_{\text{NL}} \propto \Delta L = L_2 - L_1$：环的非对称性是产生差分相移的必要条件；
+  \item $\Delta\phi_{\text{NL}} \propto (2\kappa - 1)$：当 $\kappa = 0.5$（50:50 耦合器）时
+        差分相移为零（这是因为 CW 和 CCW 的初始功率相等）；
+  \item $e^{gL_g}$ 因子体现了增益对非线性的增强效应。
+\end{enumerate}
+
+\textbf{重要说明}：当使用 50:50 耦合器时，$\kappa = 0.5$ 使 $\Delta\phi_{\text{NL}} = 0$。
+然而实际 NALM 通常采用非 50:50 耦合器（如 40:60、30:70 等），
+以确保 CW 和 CCW 之间产生足够大的非线性相位差。
+
+\subsection{NALM 反射率与透射率}
+
+将环内传输条件代入耦合器散射矩阵，可求解 NALM 的反射系数 $r_{\text{NALM}}$
+（端口 3 的反射）和透射系数 $t_{\text{NALM}}$（端口 4 的输出）。
+
+设 $E_4^+ = 0$（端口 4 无输入），由\cref{eq:coupler_4port}--\eqref{eq:loop_CCW}：
+
+\begin{align}
+  r_{\text{NALM}} &\equiv \frac{E_3^-}{E_3^+}
+  = \sqrt{1-\kappa}\, \frac{E_1^+}{E_3^+} + i\sqrt{\kappa}\, \frac{E_2^+}{E_3^+}, \\[4pt]
+  t_{\text{NALM}} &\equiv \frac{E_4^-}{E_3^+}
+  = i\sqrt{\kappa}\, \frac{E_1^+}{E_3^+} + \sqrt{1-\kappa}\, \frac{E_2^+}{E_3^+}.
+\end{align}
+
+利用环内边界条件 $E_2^+ = T_{\text{CW}} E_1^-$ 和 $E_1^+ = T_{\text{CCW}} E_2^-$，
+以及 $E_1^-$、$E_2^-$ 与 $E_3^+$ 的关系，经代数运算得：
+
+\begin{equation}
+  \boxed{
+  r_{\text{NALM}} = T_{\text{loop}} \,
+    \bigl[2i\sqrt{\kappa(1-\kappa)}\bigr],
+  }
+  \label{eq:r_NALM}
+\end{equation}
+
+其中 $T_{\text{loop}} = T_{\text{CW}} = T_{\text{CCW}}$ 为环的单圈传输系数
+（不含非线性相位差时）。
+
+考虑非线性相位差后，CW 和 CCW 的传输系数分别修正为：
+\begin{align}
+  T_{\text{CW}} &\to T_{\text{loop}} \, e^{i\phi_{\text{NL}}^{\text{CW}}}, \\
+  T_{\text{CCW}} &\to T_{\text{loop}} \, e^{i\phi_{\text{NL}}^{\text{CCW}}}.
+\end{align}
+
+完整推导（见附录）给出 NALM 功率反射率和透射率：
+\begin{align}
+  R_{\text{NALM}} &= |r_{\text{NALM}}|^2
+  = 2\kappa(1-\kappa)\,|T_{\text{loop}}|^2 \,
+    \bigl[1 + \cos(\Delta\phi_{\text{NL}} + \phi_0)\bigr],
+  \label{eq:RNALM} \\[4pt]
+  T_{\text{NALM}} &= |t_{\text{NALM}}|^2
+  = |T_{\text{loop}}|^2\,
+    \bigl[1 - 2\kappa(1-\kappa)\bigl(1 + \cos(\Delta\phi_{\text{NL}} + \phi_0)\bigr)\bigr],
+  \label{eq:TNALM}
+\end{align}
+
+其中 $\phi_0$ 为线性相位偏置（包括耦合器附加相位和可能的偏振控制器引入的偏置）。
+
+\Cref{fig:nalm_reflectivity} 展示了不同耦合比下 NALM 反射率随非线性相位差的变化。
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.2]
+  \draw[->] (0,0) -- (7,0) node[right] {$\Delta\phi_{\text{NL}}$ (rad)};
+  \draw[->] (0,0) -- (0,4.5) node[above] {$R_{\text{NALM}}$};
+
+  % Reference lines
+  \draw[dashed, gray] (0,0) -- (6.28,0);
+  \draw[dashed, gray] (0,4) -- (6.28,4) node[midway, above] {};
+
+  % Sine-like curves for different kappa
+  \draw[domain=0:6.28, smooth, blue!60!black, thick]
+    plot (\x, {2*0.45*(1-0.45)*(1+cos(\x r))});
+  \node[blue!60!black] at (5.5,2.0) {$\kappa=0.45$};
+
+  \draw[domain=0:6.28, smooth, red!60!black, thick]
+    plot (\x, {2*0.4*(1-0.4)*(1+cos(\x r))});
+  \node[red!60!black] at (5.5,1.5) {$\kappa=0.40$};
+
+  \draw[domain=0:6.28, smooth, green!50!black, thick]
+    plot (\x, {2*0.3*(1-0.3)*(1+cos(\x r))});
+  \node[green!50!black] at (5.5,1.0) {$\kappa=0.30$};
+
+  % Annotations
+  \draw[dotted] (3.14,0) -- (3.14,4.5);
+  \node at (3.14,-0.3) {$\pi$};
+  \node at (6.28,-0.3) {$2\pi$};
+\end{tikzpicture}
+\caption{NALM 反射率随非线性相位差的变化（不同耦合比）。
+在 $\Delta\phi_{\text{NL}} = 0$ 时取最大值；随 $\Delta\phi_{\text{NL}}$ 增大反射率降低，
+呈现等效可饱和吸收特性。}
+\label{fig:nalm_reflectivity}
+\end{figure}
+
+% ============================================================
+\section{全腔往返传输模型}
+\label{sec:roundtrip}
+% ============================================================
+
+\subsection{往返传输矩阵}
+
+全腔的往返传输由各元件的传输矩阵依次相乘构成。
+设从耦合器端口 3 出发的场为参考起点，完成一次往返的传输矩阵为：
+\begin{equation}
+  \mathbf{M}_{\text{RT}}(\Omega) = \mathbf{M}_{\text{lin}} \cdot
+  \mathbf{M}_{\text{NALM}}^{\text{(ref)}} \cdot
+  \mathbf{M}_{\text{lin}} \cdot
+  \mathbf{M}_{\text{mirror}},
+  \label{eq:M_RT}
+\end{equation}
+
+其中：
+\begin{itemize}
+  \item $\mathbf{M}_{\text{NALM}}^{\text{(ref)}}$ 为 NALM 作用于从线性臂入射场的反射矩阵；
+  \item $\mathbf{M}_{\text{lin}}$ 为线性臂（含隔离器、滤波器等）的单程传输矩阵；
+  \item $\mathbf{M}_{\text{mirror}}$ 为线性臂末端反射镜的矩阵。
+\end{itemize}
+
+展开各矩阵：
+\begin{align}
+  \mathbf{M}_{\text{lin}}(\Omega) &=
+  T_{\text{filter}}(\Omega) \cdot
+  \begin{pmatrix}
+    e^{i\beta(\omega_0+\Omega)L_{\text{lin}} - \frac{\alpha}{2}L_{\text{lin}}} & 0 \\[4pt]
+    0 & e^{i\beta(\omega_0+\Omega)L_{\text{lin}} - \frac{\alpha}{2}L_{\text{lin}}}
+  \end{pmatrix}, \\[4pt]
+  \mathbf{M}_{\text{mirror}} &=
+  \begin{pmatrix} r_m & 0 \\ 0 & r_m \end{pmatrix}.
+\end{align}
+
+NALM 的反射作用矩阵为：
+\begin{equation}
+  \mathbf{M}_{\text{NALM}}^{\text{(ref)}} =
+  \begin{pmatrix}
+    r_{\text{NALM}}(P, \Omega) & 0 \\[2pt]
+    0 & r_{\text{NALM}}(P, \Omega)
+  \end{pmatrix},
+  \label{eq:M_NALM_ref}
+\end{equation}
+
+其中 $r_{\text{NALM}}(P, \Omega)$ 由\cref{eq:r_NALM} 给出，
+此处显式标记其对功率 $P$ 和频率 $\Omega$ 的依赖。
+
+\subsection{往返自洽条件（线性分析）}
+
+忽略非线性时（$P \to 0$），问题退化为线性腔的谐振条件。
+往返后的场为：
+\begin{equation}
+  E^{(n+1)}(\Omega) = r_{\text{RT}}(\Omega) \, E^{(n)}(\Omega),
+  \label{eq:linear_RT}
+\end{equation}
+
+其中 $r_{\text{RT}}(\Omega) = r_{\text{NALM}}(0,\Omega) \cdot r_m \cdot
+T_{\text{lin}}^2(\Omega)$ 为往返复反射系数。
+
+稳态谐振条件为 $r_{\text{RT}}(\Omega_q) = 1$，即：
+\begin{equation}
+  |r_{\text{RT}}(\Omega_q)| = 1, \quad
+  \arg[r_{\text{RT}}(\Omega_q)] = 2\pi q, \quad q \in \mathbb{Z}.
+  \label{eq:resonance}
+\end{equation}
+
+幅度条件给出激光阈值：
+\begin{equation}
+  |r_{\text{NALM}}(0,\Omega_q)| \cdot |r_m| \cdot |T_{\text{lin}}(\Omega_q)|^2 = 1.
+  \label{eq:threshold}
+\end{equation}
+
+相位条件给出纵模频率：
+\begin{equation}
+  \beta(\omega_0 + \Omega_q) \cdot 2L_{\text{cav}} + \phi_{\text{NALM}} + \phi_m = 2\pi q,
+  \label{eq:phase_cond}
+\end{equation}
+
+其中 $L_{\text{cav}} = L_{\text{lin}} + L_{\text{loop}}/2$ 为等效腔长，
+$\phi_{\text{NALM}}$ 和 $\phi_m$ 分别为 NALM 和反射镜引入的附加相位。
+
+自由光谱范围（FSR）为：
+\begin{equation}
+  \Delta\nu_{\text{FSR}} = \frac{c}{2n_g L_{\text{cav}}},
+  \label{eq:FSR}
+\end{equation}
+
+其中 $n_g = n_{\text{eff}} + \omega \, dn_{\text{eff}}/d\omega$ 为群折射率。
+
+\subsection{全腔色散分析}
+
+往返总色散来源于各段光纤的色散贡献之和：
+\begin{equation}
+  \beta_2^{\text{total}} L_{\text{cav}} = \beta_2^{\text{passive}} L_{\text{passive}}
+  + \beta_2^{\text{gain}} L_g
+  + \beta_2^{\text{lin}} L_{\text{lin}},
+  \label{eq:total_dispersion}
+\end{equation}
+
+\begin{itemize}
+  \item 反常色散区（$\beta_2^{\text{total}} < 0$）支持孤子锁模；
+  \item 正常色散区（$\beta_2^{\text{total}} > 0$）支持耗散孤子锁模；
+  \item 近零色散区（$\beta_2^{\text{total}} \approx 0$）支持展宽脉冲或类噪声脉冲。
+\end{itemize}
+
+三阶色散（TOD）对脉冲对称性和时间位移的影响：
+\begin{equation}
+  \Delta t_{\text{TOD}} \approx \beta_3^{\text{total}} L_{\text{cav}} \cdot \Delta\omega^2,
+  \label{eq:TOD_shift}
+\end{equation}
+
+其中 $\Delta\omega$ 为脉冲带宽。
+
+\subsection{非线性传输方程的时域描述}
+
+上述频域传输矩阵分析在涉及非线性效应时需要与非线性相位修正结合。
+更完整的描述是时域中的广义非线性薛定谔方程（GNLSE）：
+
+\begin{equation}
+  \boxed{
+  \frac{\partial A}{\partial z}
+  = -\frac{\alpha}{2}A
+  + \frac{g}{2}A
+  + \frac{g}{2\Omega_g^2}\frac{\partial^2 A}{\partial t^2}
+  + i\sum_{n=2}^{N} \frac{i^n \beta_n}{n!}\frac{\partial^n A}{\partial t^n}
+  + i\gamma |A|^2 A,
+  }
+  \label{eq:GNLSE}
+\end{equation}
+
+其中 $A(z,t)$ 为慢变包络振幅，各项依次为：
+损耗、增益、增益色散、高阶色散、克尔非线性。
+
+在全腔往返框架中，每一步求解 GNLSE 等同于在传输矩阵中引入分步传播。
+采用\textbf{分步傅里叶方法（Split-Step Fourier Method, SSFM）}：
+\begin{equation}
+  A(z+\Delta z, t) \approx
+  \exp\!\left(\frac{\Delta z}{2}\hat{D}\right)
+  \exp\!\left(\int_z^{z+\Delta z} \hat{N}(z') dz'\right)
+  \exp\!\left(\frac{\Delta z}{2}\hat{D}\right)
+  A(z,t) + \mathcal{O}(\Delta z^3),
+  \label{eq:SSFM}
+\end{equation}
+
+其中色散算子 $\hat{D}$ 和非线性算子 $\hat{N}$ 定义为：
+\begin{align}
+  \hat{D} &= -\frac{\alpha}{2} + \frac{g}{2}
+            + \frac{g}{2\Omega_g^2}\frac{\partial^2}{\partial t^2}
+            + i\sum_{n=2}^{N} \frac{i^n\beta_n}{n!}\frac{\partial^n}{\partial t^n}, \\[4pt]
+  \hat{N} &= i\gamma|A|^2.
+  \label{eq:DN_operators}
+\end{align}
+
+\subsection{腔边界条件}
+
+在全腔数值模拟中，各元件的边界条件为：
+
+\begin{align}
+  A_{\text{in}}^{(m+1)}(t) &=
+  r_{\text{NALM}}\!\left(A_{\text{out}}^{(m)}(t)\right)
+  \cdot A_{\text{out}}^{(m)}(t), \\[4pt]
+  A_{\text{out}}^{(m)}(t) &=
+  \mathcal{F}^{-1}\!\left\{
+    T_{\text{filter}}(\Omega) \,
+    e^{i\beta(\omega_0+\Omega)L_{\text{lin}} - \frac{\alpha}{2}L_{\text{lin}}}
+    \, \mathcal{F}\!\left\{A_{\text{in}}^{(m)}(t)\right\}
+  \right\},
+\end{align}
+
+其中 $\mathcal{F}$ 和 $\mathcal{F}^{-1}$ 分别为傅里叶变换和逆变换，
+$A_{\text{in}}^{(m)}$ 为第 $m$ 轮往返开始时线性臂输入端的场，
+$A_{\text{out}}^{(m)}$ 为到达 NALM 输入端的场。
+
+% ============================================================
+\section{稳态求解方法}
+\label{sec:steady}
+% ============================================================
+
+\subsection{自洽迭代框架}
+
+锁模激光器的稳态脉冲解满足往返自洽条件：
+\begin{equation}
+  A^{(m+1)}(t) = A^{(m)}(t - T_R) \, e^{i\phi_0},
+  \label{eq:self_consistency}
+\end{equation}
+
+即经过一次往返后，脉冲在延迟 $T_R$（往返时间）后恢复原状（至多一个常数相位 $\phi_0$）。
+
+在数值求解中，采用以下迭代框架：
+
+\begin{algorithm}[htbp]
+\caption{九字腔锁模激光器稳态求解}
+\label{alg:steady_state}
+\begin{algorithmic}[1]
+\State \textbf{输入}: 初始噪声场 $A^{(0)}(t)$，腔参数 $\{\kappa, L_1, L_2, L_g, L_{\text{lin}}\}$，
+        光纤参数 $\{\alpha, \beta_2, \beta_3, \gamma\}$，增益参数 $\{g_0, P_{\text{sat}}, \Omega_g\}$
+\State \textbf{输出}: 稳态脉冲 $A^{(\infty)}(t)$，输出特性
+
+\State $m \gets 0$
+\State 初始化阵列 $A^{(0)}(t) \gets \mathcal{N}(0, P_{\text{noise}})$ \Comment{噪声起振}
+
+\Repeat
+  \State $m \gets m + 1$
+
+  \State \textbf{// 步骤 1: 线性臂前向传输}
+  \State $A_{\text{lin}} \gets \text{Propagate}(A^{(m-1)}, L_{\text{lin}})$
+  \Comment{含色散、损耗}
+
+  \State \textbf{// 步骤 2: 带通滤波}
+  \State $A_{\text{lin}} \gets \text{Filter}(A_{\text{lin}}, \Omega_f)$
+
+  \State \textbf{// 步骤 3: NALM 反射}
+  \State $A_{\text{NALM}} \gets \text{NALM\_Reflect}(A_{\text{lin}}, \kappa, L_1, L_g, L_2, P_{\text{sat}})$
+
+  \State \textbf{// 步骤 4: 线性臂反向传输}
+  \State $A^{(m)} \gets \text{Propagate}(A_{\text{NALM}}, L_{\text{lin}})$
+
+  \State \textbf{// 步骤 5: 增益饱和更新}
+  \State $E_p \gets \int |A^{(m)}(t)|^2 dt$
+  \State $g \gets g_0 / (1 + E_p / E_{\text{sat}})$
+
+  \State \textbf{// 步骤 6: 收敛检测}
+  \State $\epsilon \gets \|A^{(m)} - A^{(m-1)} \cdot e^{i\phi_{\text{align}}}\| / \|A^{(m)}\|$
+  \Comment{相位对齐后的残差}
+
+\Until{$\epsilon < \epsilon_{\text{tol}}$ 或 $m > m_{\text{max}}$}
+
+\State \Return $A^{(m)}$，输出脉冲特性
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{NALM 反射子算法}
+
+\begin{algorithm}[htbp]
+\caption{NALM 单次反射计算}
+\label{alg:nalm_reflect}
+\begin{algorithmic}[1]
+\Function{NALM\_Reflect}{$A_{\text{in}}, \kappa, L_1, L_g, L_2, g_0, P_{\text{sat}}, \gamma$}
+
+  \State \textbf{// CW 路径: $L_1 \to L_g \to L_2$}
+  \State $A_{\text{CW}} \gets \sqrt{\kappa} \cdot A_{\text{in}}$
+  \State $A_{\text{CW}} \gets \text{GainPropagate}(A_{\text{CW}}, L_g, g_0, P_{\text{sat}})$
+  \Comment{含增益饱和}
+  \State $\phi_{\text{CW}} \gets \gamma \cdot \text{NonlinearPhase}(A_{\text{CW}}, L_1 + L_2)$
+
+  \State \textbf{// CCW 路径: $L_2 \to L_g \to L_1$}
+  \State $A_{\text{CCW}} \gets i\sqrt{1-\kappa} \cdot A_{\text{in}}$
+  \State $A_{\text{CCW}} \gets \text{PassivePropagate}(A_{\text{CCW}}, L_2)$
+  \State $A_{\text{CCW}} \gets \text{GainPropagate}(A_{\text{CCW}}, L_g, g_0, P_{\text{sat}})$
+  \State $\phi_{\text{CCW}} \gets \gamma \cdot \text{NonlinearPhase}(A_{\text{CCW}}, L_1)$
+
+  \State \textbf{// 差分非线性相移}
+  \State $\Delta\phi_{\text{NL}} \gets \phi_{\text{CW}} - \phi_{\text{CCW}}$
+
+  \State \textbf{// NALM 干涉}
+  \State $r_{\text{NALM}} \gets 2i\sqrt{\kappa(1-\kappa)} \cdot \exp(i\Delta\phi_{\text{NL}}/2) \cdot \cos(\Delta\phi_{\text{NL}}/2)$
+  \State $A_{\text{ref}} \gets r_{\text{NALM}} \cdot A_{\text{in}}$
+
+  \State \Return $A_{\text{ref}}$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{收敛加速技术}
+
+\begin{enumerate}
+  \item \textbf{安德森加速（Anderson Acceleration）}：
+        利用前 $k$ 步的迭代历史构造更好的下一次猜测；
+  \item \textbf{连续参数延拓}：
+        从小增益或低非线性开始，逐步增加至目标参数，
+        利用前一步的解作为下一步的初值；
+  \item \textbf{自适应步长}：
+        在瞬态演化的早期阶段使用较大的传播步长，
+        接近稳态时减小步长以提高精度。
+\end{enumerate}
+
+% ============================================================
+\section{数值实现要点}
+\label{sec:numerical}
+% ============================================================
+
+\subsection{分步傅里叶法实现}
+
+\begin{algorithm}[htbp]
+\caption{对称分步傅里叶法（SSFM）}
+\label{alg:SSFM}
+\begin{algorithmic}[1]
+\Function{Propagate}{$A, L, N_z$}
+  \State $\Delta z \gets L / N_z$
+  \State $\hat{D}_{\text{half}} \gets \exp(\Delta z \cdot \hat{D}(\Omega) / 2)$
+  \Comment{频域半色散算子}
+
+  \For{$k \gets 1$ to $N_z$}
+    \State \textbf{// 半步色散}
+    \State $\tilde{A} \gets \mathcal{F}\{A\}$
+    \State $\tilde{A} \gets \hat{D}_{\text{half}} \cdot \tilde{A}$
+    \State $A \gets \mathcal{F}^{-1}\{\tilde{A}\}$
+
+    \State \textbf{// 全步非线性（含增益饱和）}
+    \State $A \gets A \cdot \exp\!\big(i\gamma|A|^2\Delta z
+           + \frac{g(P)}{2}\Delta z - \frac{\alpha}{2}\Delta z\big)$
+
+    \State \textbf{// 半步色散}
+    \State $\tilde{A} \gets \mathcal{F}\{A\}$
+    \State $\tilde{A} \gets \hat{D}_{\text{half}} \cdot \tilde{A}$
+    \State $A \gets \mathcal{F}^{-1}\{\tilde{A}\}$
+  \EndFor
+
+  \State \Return $A$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+其中频域色散算子为：
+\begin{equation}
+  \hat{D}(\Omega) = i[\beta(\omega_0+\Omega) - \beta_0 - \beta_1\Omega]
+                  - \frac{\alpha}{2}
+                  + \frac{g}{2} - \frac{g\Omega^2}{2\Omega_g^2}.
+  \label{eq:D_operator_full}
+\end{equation}
+
+\subsection{典型参数范围}
+
+\Cref{tab:typical_params} 汇总了九字腔 NALM 锁模激光器的典型设计与材料参数。
+
+\begin{table}[htbp]
+\centering
+\caption{九字腔 NALM 锁模激光器典型参数}
+\label{tab:typical_params}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{参数} & \textbf{符号} & \textbf{典型值范围} \\
+\midrule
+\multicolumn{3}{c}{\textit{腔结构}} \\
+\midrule
+环长 & $L_{\text{loop}}$ & 2\,m -- 10\,m \\
+线性臂长 & $L_{\text{lin}}$ & 0.5\,m -- 3\,m \\
+增益光纤长 & $L_g$ & 0.3\,m -- 2\,m \\
+环非对称度 & $\Delta L / L_{\text{loop}}$ & 0.1 -- 0.4 \\
+耦合比 & $\kappa$ & 0.3 -- 0.49 \\
+\midrule
+\multicolumn{3}{c}{\textit{光纤参数 (SMF-28 @ 1550\,nm)}} \\
+\midrule
+GVD & $\beta_2$ & $-21.4$\,ps$^2$/km \\
+TOD & $\beta_3$ & $0.12$\,ps$^3$/km \\
+非线性系数 & $\gamma$ & $1.1$\,W$^{-1}$km$^{-1}$ \\
+损耗 & $\alpha$ & 0.2\,dB/km \\
+模场面积 & $A_{\text{eff}}$ & 80\,\textmu m$^2$ \\
+\midrule
+\multicolumn{3}{c}{\textit{增益参数 (掺铒光纤)}} \\
+\midrule
+小信号增益 & $g_0$ & 1\,dB/m -- 40\,dB/m \\
+饱和功率 & $P_{\text{sat}}$ & 1\,mW -- 10\,mW \\
+增益带宽 & $\Delta\lambda_g$ (FWHM) & 30\,nm -- 50\,nm \\
+恢复时间 & $\tau_g$ & 10\,ms \\
+\midrule
+\multicolumn{3}{c}{\textit{滤波器}} \\
+\midrule
+带宽 & $\Delta\lambda_f$ (FWHM) & 0.5\,nm -- 5\,nm \\
+\midrule
+\multicolumn{3}{c}{\textit{典型输出特性}} \\
+\midrule
+脉冲宽度 & $\tau_p$ (FWHM) & 100\,fs -- 10\,ps \\
+重复频率 & $f_{\text{rep}}$ & 10\,MHz -- 100\,MHz \\
+平均功率 & $P_{\text{avg}}$ & 10\,mW -- 500\,mW \\
+脉冲能量 & $E_p$ & 0.1\,nJ -- 10\,nJ \\
+峰值功率 & $P_{\text{peak}}$ & 1\,kW -- 100\,kW \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{傅里叶变换实现}
+
+离散化参数：
+\begin{itemize}
+  \item 时间窗口 $T_{\text{win}}$：需覆盖至少 10 倍脉冲宽度以避免混叠；
+  \item 采样点数 $N$：$2^n$ 形式（通常 $N = 2^{10}$ 至 $2^{16}$）；
+  \item 频率分辨率 $\Delta\nu = 1/T_{\text{win}}$；
+  \item 时间分辨率 $\Delta t = T_{\text{win}}/N = 1/(2 f_{\text{max}})$；
+  \item 奈奎斯特频率 $f_{\text{max}} = N/(2T_{\text{win}})$ 需覆盖脉冲的全带宽。
+\end{itemize}
+
+% ============================================================
+\section{结论与展望}
+\label{sec:conclusion}
+% ============================================================
+
+本文系统性地建立了九字腔光放大环形镜（NALM）的传输矩阵理论框架。
+主要贡献包括：
+
+\begin{enumerate}
+  \item 推导了各腔元件的 $2\times2$ 传输矩阵，包含色散、损耗、增益和非线性修正；
+  \item 基于 Sagnac 干涉原理，建立了 NALM 的非线性反射率模型，
+        揭示了非对称增益放置、耦合比分束比与非线性相位差之间的定量关系；
+  \item 结合频域传输矩阵和时域 GNLSE，构建了全腔往返传输模型；
+  \item 给出了自洽稳态解的迭代求解算法和分步傅里叶数值实现方案；
+  \item 汇总了典型设计参数和输出特性参考范围。
+\end{enumerate}
+
+该模型可直接用于：
+\begin{itemize}
+  \item 九字腔锁模激光器的阈值预测与优化设计；
+  \item 不同色散区（反常/正常/近零）的脉冲动力学研究；
+  \item 腔参数（耦合比、非对称度、增益分布）对输出特性的影响分析；
+  \item 多脉冲、谐波锁模等复杂动力学行为的数值仿真。
+\end{itemize}
+
+未来的扩展方向包括：引入偏振自由度（$4\times4$ 传输矩阵）以研究偏振加锁和矢量孤子；
+考虑拉曼散射和自陡峭等高阶非线性效应；
+以及利用机器学习方法对多维腔参数空间进行全局优化。
+
+\section*{附录：NALM 反射系数详细推导}
+\appendix
+
+\subsection*{A.1 耦合器散射方程}
+
+将\cref{eq:coupler_4port} 展开：
+\begin{align}
+  E_1^- &= \sqrt{1-\kappa}\, E_3^+ + i\sqrt{\kappa}\, E_4^+, \label{eq:ap_E1m}\\
+  E_2^- &= i\sqrt{\kappa}\, E_3^+ + \sqrt{1-\kappa}\, E_4^+, \label{eq:ap_E2m}\\
+  E_3^- &= \sqrt{1-\kappa}\, E_1^+ + i\sqrt{\kappa}\, E_2^+, \label{eq:ap_E3m}\\
+  E_4^- &= i\sqrt{\kappa}\, E_1^+ + \sqrt{1-\kappa}\, E_2^+. \label{eq:ap_E4m}
+\end{align}
+
+\subsection*{A.2 边界条件}
+
+环内传输：
+\begin{align}
+  E_2^+ &= \tau_1 \, e^{i\phi_1} E_1^-, \label{eq:ap_bound1}\\
+  E_1^+ &= \tau_2 \, e^{i\phi_2} E_2^-, \label{eq:ap_bound2}
+\end{align}
+
+其中 $\tau_1$、$\tau_2$ 和 $\phi_1$、$\phi_2$ 分别为 CW 和 CCW 路径的振幅传输系数与相位。
+
+\subsection*{A.3 求解反射系数}
+
+设 $E_4^+ = 0$（端口 4 无外部输入），由\cref{eq:ap_E1m}--\eqref{eq:ap_bound2} 消去 $E_1^\pm$、$E_2^\pm$：
+
+\begin{align}
+  E_1^- &= \sqrt{1-\kappa}\, E_3^+, \\
+  E_2^- &= i\sqrt{\kappa}\, E_3^+, \\
+  E_2^+ &= \tau_1 e^{i\phi_1} \sqrt{1-\kappa}\, E_3^+, \\
+  E_1^+ &= \tau_2 e^{i\phi_2} \, i\sqrt{\kappa}\, E_3^+.
+\end{align}
+
+代入\cref{eq:ap_E3m}：
+\begin{align}
+  r_{\text{NALM}} &= \frac{E_3^-}{E_3^+} \\
+  &= \sqrt{1-\kappa}\, (i\sqrt{\kappa}\, \tau_2 e^{i\phi_2})
+     + i\sqrt{\kappa}\, (\sqrt{1-\kappa}\, \tau_1 e^{i\phi_1}) \\
+  &= i\sqrt{\kappa(1-\kappa)}
+     \bigl(\tau_1 e^{i\phi_1} + \tau_2 e^{i\phi_2}\bigr).
+  \label{eq:ap_r_NALM_gen}
+\end{align}
+
+当 $\tau_1 = \tau_2 = \tau$，$\phi_1 = \phi_2 + \Delta\phi = \phi + \Delta\phi$，$\phi_2 = \phi$ 时：
+\begin{align}
+  r_{\text{NALM}} &= i\sqrt{\kappa(1-\kappa)} \,
+     \tau e^{i\phi} \bigl(e^{i\Delta\phi} + 1\bigr) \\
+  &= 2i\sqrt{\kappa(1-\kappa)} \,
+     \tau e^{i(\phi + \Delta\phi/2)} \cos(\Delta\phi/2).
+  \label{eq:ap_r_NALM_final}
+\end{align}
+
+功率反射率：
+\begin{equation}
+  R_{\text{NALM}} = |r_{\text{NALM}}|^2
+  = 2\kappa(1-\kappa)\,\tau^2\,
+    \bigl[1 + \cos(\Delta\phi)\bigr].
+  \label{eq:ap_R_final}
+\end{equation}
+
+此即\cref{eq:RNALM}（取 $|T_{\text{loop}}| = \tau$）。
+
+% ============================================================
+% 参考文献
+% ============================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{duling1991all}
+I.~N.~Duling III, ``All-fiber ring soliton laser mode locked with a nonlinear mirror,''
+\textit{Optics Letters}, vol.~16, no.~8, pp.~539--541, 1991.
+
+\bibitem{haus1991coupled}
+H.~A.~Haus and W.~P.~Huang, ``Coupled-mode theory,''
+\textit{Proceedings of the IEEE}, vol.~79, no.~10, pp.~1505--1518, 1991.
+
+\bibitem{fermann2013ultrafast}
+M.~E.~Fermann and I.~Hartl, ``Ultrafast fibre lasers,''
+\textit{Nature Photonics}, vol.~7, no.~11, pp.~868--874, 2013.
+
+\bibitem{jones1941new}
+R.~C.~Jones, ``A new calculus for the treatment of optical systems,''
+\textit{Journal of the Optical Society of America}, vol.~31, no.~7, pp.~488--503, 1941.
+
+\bibitem{doran1988nonlinear}
+N.~J.~Doran and D.~Wood, ``Nonlinear-optical loop mirror,''
+\textit{Optics Letters}, vol.~13, no.~1, pp.~56--58, 1988.
+
+\bibitem{agrawal2019nonlinear}
+G.~P.~Agrawal, \textit{Nonlinear Fiber Optics}, 6th ed.
+Academic Press, 2019.
+
+\bibitem{fermann1990nonlinear}
+M.~E.~Fermann, F.~Haberl, M.~Hofer, and H.~Hochreiter,
+``Nonlinear amplifying loop mirror,''
+\textit{Optics Letters}, vol.~15, no.~13, pp.~752--754, 1990.
+
+\bibitem{okhotnikov2003ultrafast}
+O.~G.~Okhotnikov, \textit{Ultrafast Fiber Lasers}.
+Cambridge University Press, 2003.
+
+\bibitem{hansel2017figure9}
+W.~H\"ansel, H.~Hoogland, M.~Giunta, S.~Schmid, T.~Steinmetz, R.~Doubek,
+P.~Mayer, S.~Dobner, C.~Cleff, M.~Fischer, and R.~Holzwarth,
+``All polarization-maintaining fiber laser architecture for robust femtosecond pulse generation,''
+\textit{Applied Physics B}, vol.~123, no.~1, 41, 2017.
+
+\bibitem{zhou2018figure9}
+J.~Zhou, W.~Pan, X.~Gu, L.~Zhang, and Y.~Feng,
+``All-polarization-maintaining figure-9 fiber laser mode-locked by a nonlinear amplifying loop mirror,''
+\textit{Applied Optics}, vol.~57, no.~30, pp.~8905--8910, 2018.
+
+\bibitem{liu2020figure9}
+G.~Liu, X.~Jiang, A.~Wang, and Z.~Zhang,
+``Robust femtosecond figure-9 fiber laser in the 1.5~\textmu m region,''
+\textit{Optics Express}, vol.~28, no.~23, pp.~34346--34356, 2020.
+
+\bibitem{jiang2020review}
+X.~Jiang, G.~Liu, A.~Wang, and Z.~Zhang,
+``Figure-9 fiber lasers: Recent progress and perspectives,''
+\textit{Journal of Lightwave Technology}, vol.~39, no.~5, pp.~1387--1396, 2021.
+
+\end{thebibliography}
+
+\end{document}
