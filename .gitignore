@@ -1,0 +1,22 @@
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.bcf
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.run.xml
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Compiled PDF (optional, keep source only)
+# *.pdf
+
+# Editor files
+*~
+*.swp
+.DS_Store

@@ -1,0 +1,703 @@
+\documentclass[11pt,a4paper]{article}
+
+% ── 中文支持 ──
+\usepackage[UTF8]{ctex}
+\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKsansfont{SimHei}
+\setCJKmonofont{FangSong}
+
+% ── 数学与物理 ──
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage{physics}
+\usepackage{siunitx}
+\sisetup{detect-all, separate-uncertainty=true}
+
+% ── 排版 ──
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage[titletoc]{appendix}
+
+% ── 参考文献 ──
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+% ── 超链接 ──
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            citecolor=blue,
+            urlcolor=blue]{hyperref}
+
+% ── 代码 ──
+\usepackage{listings}
+\usepackage{tcolorbox}
+
+% ── 自定义命令 ──
+\newcommand{\FT}{\mathcal{F}}
+\newcommand{\IFT}{\mathcal{F}^{-1}}
+\newcommand{\Efield}{\mathbf{E}}
+\newcommand{\efield}{E}
+\newcommand{\pulseamp}{A}
+\newcommand{\carrier}{\omega_0}
+\newcommand{\rep}{f_{\text{rep}}}
+\newcommand{\ceo}{f_{\text{CEO}}}
+\newcommand{\gvd}{\beta_2}
+\newcommand{\spm}{\gamma}
+\newcommand{\pdresp}{\mathcal{R}}
+
+\title{\textbf{超快光学中的时域、频域与射频域信号分析}\\
+\large ——从光电探测到锁模脉冲的完整图景}
+\author{OUTERI}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本文从光电探测的基本物理过程出发，系统地阐述了超快光学中三个核心信号域——时域脉冲包络、光学频谱和射频（RF）功率谱——之间的数学联系与物理区别。
+基于光电二极管平方律探测原理，结合 Wiener--Khinchin 定理和自相关函数，本文推导了光学频谱与 RF 频谱之间的严格关系，
+并指出：光学频率梳是电场相干性的直接体现，而 RF 谐波梳是光强周期性的结果。
+进而，本文针对主动锁模（AM/FM mode-locking）、孤子锁模（soliton mode-locking）和调Q（Q-switching）三种典型脉冲产生机制，
+分别讨论了其时域波形、光谱特征和 RF 谱特征的差异及其物理成因。
+文中引用了 Kuizenga--Siegman 主动锁模理论、Haus 主方程、非线性薛定谔方程（NLSE）和调Q速率方程等核心理论框架，
+力求为超快光学实验中的信号判读提供严谨的理论参考。
+\end{abstract}
+
+\tableofcontents
+
+% ======================================================================
+\section{引言}
+% ======================================================================
+
+超快光学脉冲的特征化通常涉及三个互补的测量域：
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{时域}：通过自相关仪（autocorrelator）、FROG（Frequency-Resolved Optical Gating）或 SPIDER 直接或间接获取脉冲的时间强度包络 $I(t) = |E(t)|^2$；
+    \item \textbf{光学频谱域}：通过光栅光谱仪（OSA）或傅里叶变换光谱仪获取光谱功率密度 $S_{\text{opt}}(\omega) = |\tilde{E}(\omega)|^2$；
+    \item \textbf{射频域}：通过高速光电探测器（PD）将光信号转换为光电流，再利用电谱仪（ESA）测量光电流的功率谱 $S_{\text{RF}}(f)$。
+\end{enumerate}
+
+初学者常将光学频谱与 RF 频谱混为一谈。事实上，光学频谱反映的是\textbf{电场} $E(t)$ 的频率分量（$\sim\SI{200}{THz}$ 载波附近），
+而 RF 频谱反映的是\textbf{光强} $I(t) = |E(t)|^2$ 的傅里叶分量（DC 至 $\sim\SI{100}{GHz}$ 探测器带宽）。
+二者的关系由\textbf{平方律探测}和\textbf{Wiener--Khinchin 定理}严格约束。
+
+本文的目的是以严密的数学语言阐明这三个域之间的内在联系，并结合三种典型脉冲类型（主动锁模、孤子锁模、调Q）进行对比分析。
+
+% ======================================================================
+\section{数学基础：光场表示与探测理论}
+% ======================================================================
+
+\subsection{光场的复解析表示}
+
+在标量近似下，线偏振超快光脉冲的实电场可写为载波-包络形式\cite{Diels2006}：
+
+\begin{equation}\label{eq:real_field}
+E^{(r)}(t) = \frac{1}{2} A(t) e^{i[\omega_0 t + \phi(t)]} + \text{c.c.}
+\end{equation}
+
+其中 $A(t) \in \mathbb{R}^+$ 为慢变包络振幅（slowly-varying envelope），$\omega_0$ 为载波角频率（$\omega_0/2\pi \sim \SI{193}{THz}$ 对应 $\SI{1550}{nm}$），
+$\phi(t)$ 为时间相位。复解析信号定义为：
+
+\begin{equation}\label{eq:complex_field}
+E(t) = A(t) e^{i[\omega_0 t + \phi(t)]}
+\end{equation}
+
+其实部给出物理电场：$E^{(r)}(t) = \Re[E(t)]$。瞬时角频率为：
+
+\begin{equation}\label{eq:instant_freq}
+\omega(t) = \dv{t} \left[ \omega_0 t + \phi(t) \right] = \omega_0 + \dv{\phi(t)}{t}
+\end{equation}
+
+当 $\dddot{\phi}(t) \neq 0$ 时，称脉冲带有\textbf{啁啾}（chirp）。线性啁啾 $\phi(t) = C t^2/2$ 给出 $\omega(t) = \omega_0 + C t$。
+
+\subsection{脉冲强度与能量}
+
+瞬时光功率（在探测平面上）为：
+
+\begin{equation}\label{eq:instant_power}
+P(t) = \frac{1}{2} \epsilon_0 c n A_{\text{eff}} |E(t)|^2 = \frac{1}{2} \epsilon_0 c n A_{\text{eff}} A^2(t)
+\end{equation}
+
+其中 $A_{\text{eff}}$ 为有效模面积。在实际处理中，我们更关心归一化强度包络：
+
+\begin{equation}\label{eq:intensity}
+I(t) = |E(t)|^2 = A^2(t)
+\end{equation}
+
+脉冲能量 $W = \int_{-\infty}^{\infty} P(t) \dd{t}$，峰值功率 $P_{\text{peak}} \propto \max[I(t)]$。
+
+\subsection{光场的傅里叶变换与光谱}
+
+时域电场 $E(t)$ 的傅里叶变换给出复频谱：
+
+\begin{equation}\label{eq:ft_field}
+\tilde{E}(\omega) = \FT[E(t)](\omega) = \int_{-\infty}^{\infty} E(t) e^{-i\omega t} \dd{t}
+\end{equation}
+
+\textbf{功率谱密度}（Power Spectral Density, PSD），即通常所说的"光谱"，为：
+
+\begin{equation}\label{eq:optical_spectrum}
+S_{\text{opt}}(\omega) = |\tilde{E}(\omega)|^2
+\end{equation}
+
+根据 Parseval 定理：
+\begin{equation}
+\int_{-\infty}^{\infty} |E(t)|^2 \dd{t} = \frac{1}{2\pi} \int_{-\infty}^{\infty} |\tilde{E}(\omega)|^2 \dd{\omega}
+\end{equation}
+
+\subsection{光电探测：平方律探测}
+
+高速光电二极管（PIN或UTC-PD）的物理过程是\textbf{光子吸收产生电子-空穴对}。在非饱和区，光电流与入射光功率成正比：
+
+\begin{equation}\label{eq:photocurrent}
+i(t) = \mathcal{R} \cdot P(t) = \mathcal{R} \cdot \frac{1}{2} |E(t)|^2 \propto I(t)
+\end{equation}
+
+其中 $\mathcal{R}$ 为探测器响应度（A/W）。\textbf{关键点}：PD 响应的是光强包络 $I(t) = |E(t)|^2$，而非电场 $E(t)$ 本身。
+这一\textbf{平方律}过程消除了光载波相位信息，但保留了强度调制的全部信息。
+
+将式(\ref{eq:complex_field})代入：
+
+\begin{equation}\label{eq:pd_detailed}
+\begin{aligned}
+i(t) &\propto |A(t) e^{i(\omega_0 t + \phi(t))}|^2 = A^2(t) \\
+&\propto I(t)
+\end{aligned}
+\end{equation}
+
+可见，光载波频率 $\omega_0$（$\sim 10^{14}$--$10^{15}$ Hz）超出了任何电子器件的响应带宽，被自然滤除。
+PD输出的光电流仅包含\textbf{强度包络}的时变信息。
+
+\subsection{Wiener--Khinchin 定理与 RF 谱}
+
+光电流 $i(t)$ 的功率谱密度由 Wiener--Khinchin 定理给出\cite{Mandl1995}：
+
+\begin{equation}\label{eq:wk_intensity}
+S_{\text{RF}}(f) = \FT \left[ \langle i(t) i(t+\tau) \rangle \right](f)
+\end{equation}
+
+其中 $\langle \cdot \rangle$ 表示时间平均（对应各态历经过程）。对于光电流 $i(t) \propto I(t)$，有：
+
+\begin{equation}\label{eq:rf_autocorr}
+S_{\text{RF}}(f) \propto \FT \left[ \langle I(t) I(t+\tau) \rangle \right](f)
+\end{equation}
+
+这就是 RF 频谱——\textbf{强度自相关函数的傅里叶变换}。
+
+\subsection{光学频谱与 RF 频谱的关系}
+
+这是本文的核心关系式。考虑复电场 $E(t)$，其强度自相关可以借助高斯矩定理（对热光源）或直接利用电场四阶相干函数表示\cite{Loudon2000}。
+对于\textbf{相干脉冲}（锁模激光），$I(t) = |E(t)|^2$ 的傅里叶变换为：
+
+\begin{equation}\label{eq:optical_rf_relation}
+\begin{aligned}
+\FT[I(t)](f) &= \FT[E(t) E^*(t)](f) \\
+&= \int_{-\infty}^{\infty} \tilde{E}(\omega) \tilde{E}^*(\omega - 2\pi f) \frac{\dd{\omega}}{2\pi} \\
+&= (\tilde{E} \star \tilde{E})(2\pi f)
+\end{aligned}
+\end{equation}
+
+其中 $\star$ 表示互相关运算。式(\ref{eq:optical_rf_relation})揭示了核心关系：
+
+\begin{quote}
+\textbf{光电流的傅里叶频谱（RF 谱）等于光谱复振幅的自相关函数。}
+$S_{\text{RF}}(f)$ 反映了光谱中频率间隔为 $f$ 的所有纵模对之间的拍频信号的总和。
+\end{quote}
+
+这一关系可等价表述为：RF 频谱 $S_{\text{RF}}(f)$ 的包络由\textbf{单脉冲强度傅里叶变换}给出，
+而载波 $\omega_0$ 处的精细光谱结构消失于平方律检波过程中。
+
+% ======================================================================
+\section{周期性脉冲串：光学频率梳与 RF 频率梳}
+% ======================================================================
+
+考虑锁模激光器输出的\textbf{周期性脉冲串}。假设所有脉冲完全相同，重复周期 $T_R = 1/\frep$：
+
+\subsection{时域周期性脉冲串}
+
+\begin{equation}\label{eq:pulse_train}
+E_{\text{train}}(t) = \sum_{n=-\infty}^{\infty} E_{\text{single}}(t - n T_R)
+\end{equation}
+
+利用 Poisson 求和公式，时域周期脉冲串的傅里叶变换为频域的 Dirac 梳：
+
+\begin{equation}\label{eq:comb_frequency}
+\begin{aligned}
+\tilde{E}_{\text{train}}(\omega) &= \FT\left[ \sum_n E_{\text{single}}(t - n T_R) \right](\omega) \\
+&= \tilde{E}_{\text{single}}(\omega) \cdot \omega_{\text{rep}} \sum_{m=-\infty}^{\infty} \delta(\omega - \omega_{\text{CEO}} - m \omega_{\text{rep}})
+\end{aligned}
+\end{equation}
+
+其中 $\omega_{\text{rep}} = 2\pi \frep$，$\omega_{\text{CEO}} = 2\pi \fceo$ 为\textbf{载波-包络偏移频率}（Carrier-Envelope Offset）。
+这是由于群速度与相速度差异导致每个脉冲的载波相位相对于包络滑移 $\Delta\phi_{\text{CEO}}$：
+
+\begin{equation}\label{eq:ceo}
+\fceo = \frac{\frep}{2\pi} \Delta\phi_{\text{CEO}}
+\end{equation}
+
+\subsection{光学频率梳}
+
+式(\ref{eq:comb_frequency})的图像是明确的：光学频谱由一系列等间距的离散纵模组成：
+
+\begin{equation}\label{eq:optical_comb}
+\nu_m = m \frep + \fceo, \quad m \in \mathbb{Z},\; m \sim 10^5\text{--}10^6
+\end{equation}
+
+每条梳齿的幅度由单脉冲光谱包络 $\tilde{E}_{\text{single}}(\omega)$ 决定。梳齿间距为 $\frep$（典型值 $\sim\SI{100}{MHz}$--$\SI{10}{GHz}$）。
+这就是\textbf{光学频率梳}（Optical Frequency Comb, OFC）\cite{Udem2002,Jones2000}。
+
+\subsection{RF 谐波梳}
+
+将脉冲串代入光电流表达式：
+
+\begin{equation}\label{eq:pd_train}
+i_{\text{train}}(t) \propto \sum_{n} I_{\text{single}}(t - n T_R)
+\end{equation}
+
+对周期为 $T_R$ 的光强周期函数做傅里叶级数展开：
+
+\begin{equation}\label{eq:rf_comb}
+\begin{aligned}
+i_{\text{train}}(t) &= \sum_{k=-\infty}^{\infty} c_k e^{i 2\pi k \frep t} \\
+c_k &= \frep \int_{-T_R/2}^{T_R/2} I_{\text{single}}(t) e^{-i 2\pi k \frep t} \dd{t} \\
+&= \frep \cdot \FT[I_{\text{single}}](k \frep)
+\end{aligned}
+\end{equation}
+
+因此，RF 功率谱为：
+
+\begin{equation}\label{eq:rf_comb_spectrum}
+S_{\text{RF}}(f) = \sum_{k=1}^{\infty} |c_k|^2 \delta(f - k \frep)
+\end{equation}
+
+这意味着\textbf{RF 频谱同样表现为频率梳}，但：
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{无 CEO 项}：平方律探测消除了 $\fceo$（$|e^{i\omega_0 t}|^2 = 1$），RF 梳仅含 $\frep$ 的整数倍谐波；
+    \item \textbf{包络不同}：RF 梳的包络为 $|\FT[I_{\text{single}}(t)](f)|^2$，即单脉冲\textbf{强度}的功率谱，而非电场的功率谱；
+    \item \textbf{带宽限制}：RF 梳的谐波次数受限于 PD 和 ESA 的带宽（通常至 $\sim\SI{50}{GHz}$，约第 $50$--$500$ 次谐波），远小于光学梳的 $10^5$ 次。
+\end{enumerate}
+
+图 \ref{fig:domain_comparison} 给出了三个域之间的对应关系示意。
+
+\begin{figure}[htbp]
+\centering
+\begin{tcolorbox}[width=0.95\textwidth, colback=blue!5, colframe=blue!50]
+\textbf{三个域之间的映射关系：}
+\begin{itemize}
+    \item \textbf{时域} $I(t)$：脉冲强度包络，周期 $T_R = 1/\frep$
+    \item \textbf{光谱域} $S_{\text{opt}}(\nu)$：光学频率梳 $\nu_m = m\frep + \fceo$，包络 $\propto |\FT[E_{\text{single}}]|^2$
+    \item \textbf{RF 域} $S_{\text{RF}}(f)$：RF 谐波梳 $f_k = k\frep$（无 $\fceo$），包络 $\propto |\FT[I_{\text{single}}]|^2$
+\end{itemize}
+\end{tcolorbox}
+\caption{时域、光谱域和RF域之间的对应关系}
+\label{fig:domain_comparison}
+\end{figure}
+
+% ======================================================================
+\section{三种典型脉冲产生机制的对比分析}
+% ======================================================================
+
+\subsection{主动锁模（Active Mode-Locking）}
+
+\subsubsection{物理机制}
+
+主动锁模通过在激光腔内放置\textbf{强度调制器}（AM 锁模）或\textbf{相位调制器}（FM 锁模）实现。
+调制器以频率 $f_m = \frep = c/2L$（纵模间距）驱动，使得各纵模之间建立固定的相位关系。
+
+\subsubsection{Kuizenga--Siegman 理论}
+
+Kuizenga 和 Siegman 在 1970 年给出了主动锁模的解析理论\cite{Kuizenga1970}。在稳态下，
+脉冲服从高斯形解：
+
+\begin{equation}\label{eq:am_pulse}
+I_{\text{AM}}(t) = I_0 \exp\left(-\frac{t^2}{\tau_{\text{AM}}^2}\right)
+\end{equation}
+
+脉冲宽度由 Kuizenga--Siegman 公式给出：
+
+\begin{equation}\label{eq:ks_formula}
+\tau_p = \frac{\sqrt{2\sqrt{2} \ln 2}}{\pi} \sqrt{\frac{1}{f_m \Delta f_g}} \approx 0.45 \sqrt{\frac{1}{f_m \Delta f_g}}
+\end{equation}
+
+其中 $\Delta f_g$ 为增益介质的增益带宽（FWHM），$f_m$ 为调制频率。
+
+\subsubsection{光谱特征}
+
+高斯脉冲的傅里叶变换仍为高斯形：
+\begin{equation}\label{eq:gaussian_spectrum}
+\tilde{E}_{\text{AM}}(\omega) \propto \exp\left(-\frac{\tau_{\text{AM}}^2 (\omega - \omega_0)^2}{4}\right)
+\end{equation}
+
+光谱宽度（FWHM）：
+\begin{equation}\label{eq:gaussian_bw}
+\Delta \nu_{\text{opt}} = \frac{\sqrt{2\ln 2}}{\pi} \cdot \frac{1}{\tau_p} \approx \frac{0.375}{\tau_p}
+\end{equation}
+
+时间-带宽积（Time-Bandwidth Product, TBP）：
+\begin{equation}\label{eq:tbp_gaussian}
+\Delta \nu_{\text{opt}} \cdot \tau_p = \frac{2\ln 2}{\pi} \approx 0.441 \quad (\text{高斯，无啁啾})
+\end{equation}
+
+在实际器件中，残余啁啾导致 TBP $> 0.441$。
+
+\subsubsection{RF 频谱特征}
+
+由式(\ref{eq:rf_comb})，高斯脉冲 $I(t) \propto \exp(-t^2/\tau_{\text{AM}}^2)$ 给出：
+
+\begin{equation}\label{eq:am_rf_envelope}
+\begin{aligned}
+\FT[I_{\text{AM}}](f) &\propto \exp\left(-\pi^2 \tau_{\text{AM}}^2 f^2\right) \\
+|c_k|^2 &\propto \exp\left(-2\pi^2 \tau_{\text{AM}}^2 k^2 \frep^2\right)
+\end{aligned}
+\end{equation}
+
+RF 功率谱表现为在 $k\frep$ 处的离散梳齿，包络为高斯函数。
+$1/e$ 滚降频率为 $f_{3\text{dB}} \approx 0.133 / \tau_p$。
+
+\begin{tcolorbox}[width=0.95\textwidth, colback=green!5, colframe=green!50, title=主动锁模 RF 特征总结]
+\begin{itemize}
+    \item \textbf{梳齿纯净}：极低的相位噪声（受限于调制器驱动源的噪声）
+    \item \textbf{谐波数量}：$N_{\text{harm}} \approx \Delta f_g / \frep$（通常 $10^2$--$10^3$）
+    \item \textbf{无 CEO}：RF 域不存在 $\fceo$ 信息
+    \item \textbf{超低时序抖动}：积分 RMS 抖动 $< \SI{100}{fs}$ 可达
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{孤子锁模（Soliton Mode-Locking）}
+
+\subsubsection{物理机制}
+
+孤子锁模依赖于腔内色散与非线性的精确平衡。脉冲在反常色散区（$\gvd < 0$）
+传播时，群速度色散（GVD）引起的脉冲展宽被自相位调制（SPM）引起的啁啾所补偿。
+
+脉冲演化由\textbf{非线性薛定谔方程}（NLSE）或 Haus 主方程描述\cite{Haus2000}：
+
+\begin{equation}\label{eq:nlse}
+\frac{\partial A}{\partial z} + \frac{i\gvd}{2} \frac{\partial^2 A}{\partial T^2} = i\spm |A|^2 A
+\end{equation}
+
+其中 $T = t - z/v_g$ 为延迟时间坐标，$\gvd$ 为群速度色散参数，$\spm$ 为非线性系数。
+
+\subsubsection{基态孤子解}
+
+NLSE 的基态孤子解为：
+
+\begin{equation}\label{eq:soliton_shape}
+A(T) = \sqrt{P_0} \; \sech\left(\frac{T}{\tau_s}\right)
+\end{equation}
+
+\begin{equation}\label{eq:soliton_intensity}
+I_{\text{sol}}(t) = P_0 \; \sech^2\left(\frac{t}{\tau_s}\right)
+\end{equation}
+
+孤子面积定理给出 $P_0 \tau_s^2 = |\gvd|/\spm$。孤子脉冲宽度（FWHM）：
+
+\begin{equation}\label{eq:soliton_fwhm}
+\tau_{\text{FWHM}}^{\text{sech}^2} = 2\ln(1+\sqrt{2}) \cdot \tau_s \approx 1.763 \tau_s
+\end{equation}
+
+\subsubsection{光谱特征}
+
+$\sech(t/\tau_s)$ 的傅里叶变换为 $\pi \tau_s \sech(\pi^2 \tau_s f/2)$，故：
+
+\begin{equation}\label{eq:soliton_spectrum}
+\begin{aligned}
+\tilde{E}_{\text{sol}}(\omega) &\propto \sech\left(\frac{\pi}{2} \tau_s (\omega - \omega_0)\right) \\
+S_{\text{opt}}(\omega) &\propto \sech^2\left(\frac{\pi}{2} \tau_s (\omega - \omega_0)\right)
+\end{aligned}
+\end{equation}
+
+光谱 3-dB 宽度：$\Delta \nu_{\text{sol}} \approx 0.315 / \tau_{\text{FWHM}}$。
+
+TBP：$\Delta \nu \cdot \tau_p \approx 0.315$（$\sech^2$ 脉冲，无啁啾）。
+
+\subsubsection{Kelly 边带}
+
+实际孤子激光器中，脉冲在腔内经历周期性的微扰（增益、损耗、输出耦合）。
+这一周期性扰动导致\textbf{色散波}的共振激发，在光谱上表现为\textbf{Kelly 边带}\cite{Kelly1992}：
+
+\begin{equation}\label{eq:kelly}
+\Delta \lambda_m = \pm \sqrt{\frac{2m\lambda_0^2}{c D L} - \frac{\lambda_0^4}{(c \tau_s)^2}}
+\end{equation}
+
+其中 $D$ 为色散参数，$L$ 为腔长。Kelly 边带是识别孤子锁模的重要光谱特征。
+
+\subsubsection{RF 频谱特征}
+
+由式(\ref{eq:rf_comb})，$\sech^2$ 脉冲强度傅里叶变换为：
+
+\begin{equation}\label{eq:soliton_rf}
+\begin{aligned}
+\FT[I_{\text{sol}}](f) &\propto \frac{f}{\sinh(\pi^2 \tau_s f/2)} \\
+|c_k|^2 &\propto \left( \frac{k\frep}{\sinh(\pi^2 \tau_s k\frep/2)} \right)^2
+\end{aligned}
+\end{equation}
+
+与高斯脉冲相比，$\sech^2$ 脉冲的 RF 包络在高频处滚降更快（指数 vs. 高斯）。
+
+\begin{tcolorbox}[width=0.95\textwidth, colback=orange!5, colframe=orange!50, title=孤子锁模 RF 特征总结]
+\begin{itemize}
+    \item \textbf{梳齿纯净}：与主动锁模相当的低相位噪声
+    \item \textbf{RF 包络形状}：$\propto [f/\sinh(\pi^2 \tau_s f/2)]^2$，比高斯更陡
+    \item \textbf{谐波次数}：典型 $10^2$--$10^3$
+    \item \textbf{量子极限时序抖动}：低于主动锁模（脉冲更短）
+    \item \textbf{光谱散斑}：Kelly 边带在光谱中可见，但在 RF 域中不直接表现
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{调Q脉冲（Q-Switched Pulses）}
+
+\subsubsection{物理机制}
+
+调Q通过周期性地调制腔内损耗（主动调Q：声光/电光调制器；被动调Q：可饱和吸收体），
+使激光器在"高Q值"期间释放储存的能量，产生巨脉冲。\textbf{调Q不要求各纵模之间保持固定的相位关系}。
+
+调Q动力学由耦合速率方程描述\cite{Siegman1986}：
+
+\begin{equation}\label{eq:qswitch_rate}
+\begin{aligned}
+\frac{\dd{\phi}}{\dd{t}} &= \frac{\phi}{t_r} (2\sigma n l - \delta) \\
+\frac{\dd{n}}{\dd{t}} &= R_p - \gamma n - K n \phi
+\end{aligned}
+\end{equation}
+
+其中 $\phi$ 为腔内光子数密度，$n$ 为反转粒子数密度，$\sigma$ 为受激发射截面，$\delta$ 为往返损耗。
+
+\subsubsection{脉冲形状}
+
+调Q脉冲的时域形状不对称，典型上升沿陡峭、下降沿缓慢：
+
+\begin{equation}\label{eq:qswitch_shape}
+I_{\text{QS}}(t) \approx I_0 \cdot \begin{cases}
+\exp(t/\tau_r) & t < 0 \\
+\exp(-t/\tau_f) & t \geq 0
+\end{cases}
+\end{equation}
+
+其中 $\tau_r \ll \tau_f$。脉冲宽度通常为 ns--$\mu$s 量级，远宽于锁模脉冲（fs--ps）。
+
+\subsubsection{光谱特征}
+
+调Q激光器通常运行于\textbf{多纵模}状态，各纵模之间\textbf{无固定相位关系}。
+光谱表现为增益带宽内的多个随机相位纵模的叠加：
+
+\begin{equation}\label{eq:qswitch_spectrum}
+S_{\text{opt}}(\nu) = \sum_{m} |\tilde{E}_m|^2 \delta(\nu - \nu_m), \quad \phi_m \text{ 随机}
+\end{equation}
+
+纵模数量：$N \approx \Delta \nu_g / \Delta \nu_{\text{FSR}}$，典型值 $10^3$--$10^5$。
+由于缺乏相位锁定，光谱\textbf{无梳状结构}，表现为\textbf{平滑的宽带包络}。
+
+\subsubsection{RF 频谱特征——关键差异}
+
+调Q脉冲的 RF 谱与锁模脉冲存在\textbf{本质区别}：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{无 RF 频率梳}：各纵模相位随机，不同纵模对的拍频信号相位也随机。
+    虽然每个纵模对 $(m, m+k)$ 产生频率为 $k \cdot \Delta \nu_{\text{FSR}}$ 的拍频，
+    但所有拍频分量的\textbf{相位随机叠加}，导致 RF 功率谱为\textbf{连续宽带噪声}而非离散梳齿\cite{Vasilev1988}。
+
+    \item \textbf{强度噪声谱}：RF 谱近似为平滑的宽带谱，滚降频率 $\sim 1/\tau_p$。
+
+    \item \textbf{脉冲间不相干}：相邻脉冲的纵模相位关系完全不同，无法形成稳定的拍频信号。
+\end{enumerate}
+
+形式化地，对于 $N$ 个随机相位的纵模 $\tilde{E}_m = |\tilde{E}_m| e^{i\phi_m}$，光电流的傅里叶分量为：
+
+\begin{equation}\label{eq:qswitch_rf_derivation}
+\begin{aligned}
+\FT[i(t)](f) &\propto \sum_{m,n} |\tilde{E}_m||\tilde{E}_n| \delta(f - |\nu_m - \nu_n|) e^{i(\phi_m - \phi_n)}
+\end{aligned}
+\end{equation}
+
+对于随机且统计独立的 $\phi_m$，$f \neq 0$ 时的期望功率为：
+
+\begin{equation}\label{eq:qswitch_rf_result}
+\mathbb{E}[|i(f)|^2] \propto \sum_{m,n} |\tilde{E}_m|^2 |\tilde{E}_n|^2 \approx N^2 \cdot \overline{|\tilde{E}|^4}
+\end{equation}
+
+即 RF 谱为\textbf{平滑的宽带连续谱}，无梳状结构。这与锁模激光器的离散 RF 梳形成鲜明对比。
+
+\begin{tcolorbox}[width=0.95\textwidth, colback=red!5, colframe=red!50, title=调Q脉冲 RF 特征总结]
+\begin{itemize}
+    \item \textbf{RF 连续谱}：无离散梳齿，不形成 RF 频率梳
+    \item \textbf{宽带噪声}：从 DC 延伸至 $\sim 1/\tau_p$（$\sim\SI{100}{MHz}$--$\SI{1}{GHz}$）
+    \item \textbf{高时序抖动}：脉冲间无相位相干性，时间抖动 $\sim \tau_p$
+    \item \textbf{无 $\frep$ 参考}：无法从 RF 谱中提取精确的重复频率参考
+    \item \textbf{光谱相似但 RF 不同}：调Q的光谱可能窄于锁模，但 RF 谱完全没有梳结构
+\end{itemize}
+\end{tcolorbox}
+
+% ======================================================================
+\section{三种机制的全面对比}
+% ======================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{主动锁模、孤子锁模与调Q脉冲的特性对比}
+\label{tab:comparison}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{@{}p{2.8cm} p{3.2cm} p{3.2cm} p{3.2cm}@{}}
+\toprule
+\textbf{特性} & \textbf{主动锁模} & \textbf{孤子锁模} & \textbf{调Q} \\
+\midrule
+脉冲形状 & 高斯 $\exp(-t^2/\tau^2)$ & $\sech^2(t/\tau_s)$ & 不对称指数形 \\
+\hline
+典型脉宽 & ps -- ns & fs -- ps & ns -- $\mu$s \\
+\hline
+光谱形状 & 高斯 $\propto \exp(-\tau^2 \Delta\omega^2/4)$ & $\sech^2$ 形 + Kelly边带 & 平滑、无规则、多纵模 \\
+\hline
+光谱结构 & \textbf{频率梳}：$\nu_m = m\frep+\fceo$ & \textbf{频率梳}：$\nu_m = m\frep+\fceo$ & \textbf{无梳}：随机相位纵模叠加 \\
+\hline
+TBP & $\sim 0.441$（无啁啾） & $\sim 0.315$（无啁啾） & $\gg 1$（非变换极限） \\
+\hline
+RF谱结构 & \textbf{谐波梳}：$f_k = k\frep$ & \textbf{谐波梳}：$f_k = k\frep$ & \textbf{连续谱}：宽带噪声 \\
+\hline
+RF包络 & $\propto \exp(-2\pi^2\tau^2 f^2)$ & $\propto [f/\sinh(\pi^2\tau_s f/2)]^2$ & $\sim [1+(2\pi f\tau)^2]^{-1}$ \\
+\hline
+RF相位噪声 & 极低（$\ll -120$ dBc/Hz） & 极低（量子极限） & 高（无相位记忆） \\
+\hline
+脉冲间相干性 & \textbf{是}（固定相位关系） & \textbf{是}（固定相位关系） & \textbf{否}（随机相位） \\
+\hline
+CEO信息 & 存在（需 $f$--$2f$ 干涉测量） & 存在（需 $f$--$2f$ 干涉测量） & 不存在（脉冲间无 CEO 一致性） \\
+\hline
+关键理论 & Kuizenga--Siegman & NLSE / Haus 主方程 & 速率方程 \\
+\hline
+\end{tabular}
+\end{table}
+
+图 \ref{fig:rf_comparison_table} 进一步总结了 RF 谱特征的系统性差异。
+
+\begin{figure}[htbp]
+\centering
+\begin{tcolorbox}[width=0.95\textwidth, colback=yellow!5, colframe=yellow!80, title=RF谱判断准则]
+\textbf{如何从 RF 谱判断脉冲类型：}
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{是否存在锐利的离散谐波峰？}
+    \begin{itemize}
+        \item 是 → 锁模（主动或孤子），继续判断
+        \item 否 → 调Q（或弛豫振荡、多脉冲不稳定状态）
+    \end{itemize}
+    \item \textbf{RF 包络的高频滚降形状？}
+    \begin{itemize}
+        \item 高斯形（$\propto e^{-f^2}$）→ 倾向主动锁模
+        \item 指数形（$\propto e^{-f}$）→ 倾向孤子锁模
+    \end{itemize}
+    \item \textbf{谐波次数和相位噪声？}
+    \begin{itemize}
+        \item 高次谐波清晰 + 低相位噪声 → 稳定锁模
+        \item 谐波变宽或消失在高频 → 脉冲间存在抖动或啁啾
+    \end{itemize}
+\end{enumerate}
+\end{tcolorbox}
+\caption{RF 谱用于脉冲类型判断的实用准则}
+\label{fig:rf_comparison_table}
+\end{figure}
+
+% ======================================================================
+\section{实验实例与数值模拟}
+% ======================================================================
+
+\subsection{实例 1：$\SI{1550}{nm}$ 孤子锁模光纤激光器}
+
+考虑典型参数：$\frep = \SI{100}{MHz}$，$\tau_{\text{FWHM}} = \SI{100}{fs}$，$\sech^2$ 形。
+
+\begin{itemize}
+    \item \textbf{光谱}：光学频率梳 $\nu_m = m \cdot \SI{100}{MHz} + \fceo$，中心 $\SI{1550}{nm}$（$\SI{193.4}{THz}$），
+    3-dB 带宽 $\Delta\nu \approx 0.315/\SI{100}{fs} = \SI{3.15}{THz}$（约 $\SI{25}{nm}$）
+    \item \textbf{RF 谱}：$k=1$ 处 $\SI{100}{MHz}$ 谐波峰，包络 3-dB 滚降 $\sim\SI{2.8}{GHz}$（$\approx 28$ 次谐波可见）
+    \item \textbf{谐波可见度}：在 $\SI{26.5}{GHz}$ 电谱仪带宽内可见 $\sim 265$ 个 RF 谐波
+\end{itemize}
+
+\subsection{实例 2：$\SI{1064}{nm}$ 主动锁模 Nd:YAG 激光器}
+
+典型参数：$\frep = \SI{80}{MHz}$，$\tau_p = \SI{10}{ps}$（高斯形）。
+
+\begin{itemize}
+    \item \textbf{光谱}：光学梳齿间距 $\SI{80}{MHz}$，3-dB 带宽 $\Delta\nu \approx 0.441/\SI{10}{ps} = \SI{44.1}{GHz}$
+    \item \textbf{RF 谱}：高斯包络，3-dB 滚降 $\sim\SI{13.3}{GHz}$（$\approx 166$ 次谐波在 3-dB 内）
+    \item \textbf{光谱窄但 RF 宽}：与例 1 对比，本例光谱更窄（$\SI{44}{GHz}$ vs. $\SI{3.15}{THz}$），
+    但 RF 包络更宽（$\SI{13.3}{GHz}$ vs. $\SI{2.8}{GHz}$），因为 RF 包络反映的是\textbf{强度}傅里叶变换，
+    而更短的脉冲（孤子）具有更窄的强度自相关函数。
+\end{itemize}
+
+\subsection{实例 3：主动调Q $\SI{1064}{nm}$ Nd:YAG}
+
+典型参数：$\tau_p = \SI{10}{ns}$，调制频率 $\SI{1}{kHz}$。
+
+\begin{itemize}
+    \item \textbf{光谱}：$\sim\SI{30}{GHz}$ 宽度，包含 $\sim 10^4$ 个无规相位的纵模
+    \item \textbf{RF 谱}：连续宽带噪声，无离散峰。$1/\tau_p \sim \SI{100}{MHz}$ 处滚降
+    \item \textbf{判断}：RF 谱中完全无 $\frep = \SI{1}{kHz}$ 的谐波峰（PD 带宽 $\ll \SI{1}{kHz}$ 不响应），
+    且即便在更高频也无离散梳齿
+\end{itemize}
+
+% ======================================================================
+\section{结论}
+% ======================================================================
+
+本文从光电探测的平方律原理出发，系统推导了超快光学中三个核心信号域——时域、光谱域和 RF 域——之间的数学映射关系。
+核心结论可概括如下：
+
+\begin{enumerate}[label=(\arabic*)]
+    \item \textbf{平方律探测是连接光谱与 RF 谱的桥梁}：PD 输出的光电流正比于光强 $|E(t)|^2$，
+    消除了载波频率 $\omega_0$，使 RF 谱成为强度自相关函数的傅里叶变换；
+
+    \item \textbf{光学频率梳与 RF 频率梳的区别}：光学梳 $\nu_m = m\frep + \fceo$ 是电场相干性的体现；
+    RF 梳 $f_k = k\frep$ 是光强周期性的体现，无 $\fceo$ 项；
+
+    \item \textbf{RF 谱是判别脉冲类型的有效工具}：锁模脉冲在 RF 域呈现出锐利的离散谐波梳，
+    其包络形状可区分高斯型（主动锁模）和 $\sech^2$ 型（孤子锁模）；调Q脉冲在 RF 域呈连续宽带噪声，无梳状结构；
+
+    \item \textbf{光谱特征与 RF 特征的互补性}：光谱反映电场的频谱内容（含 Kelly 边带等精细结构），
+    RF 谱反映光强的频谱内容（含重复频率和时间抖动信息），二者从不同维度描述同一物理系统。
+\end{enumerate}
+
+% ======================================================================
+% 参考文献
+% ======================================================================
+\printbibliography[heading=bibintoc, title={参考文献}]
+
+% ======================================================================
+% 附录
+% ======================================================================
+\appendix
+\section{关键公式推导补充}
+
+\subsection{Poisson 求和公式与光学频率梳}
+
+周期脉冲串 $E_{\text{train}}(t) = \sum_n E_{\text{single}}(t - nT_R)$ 的傅里叶变换：
+
+\begin{equation}
+\begin{aligned}
+\tilde{E}_{\text{train}}(\omega) &= \int_{-\infty}^{\infty} \sum_n E_{\text{single}}(t - nT_R) e^{-i\omega t} \dd{t} \\
+&= \sum_n e^{-i\omega n T_R} \int_{-\infty}^{\infty} E_{\text{single}}(t') e^{-i\omega t'} \dd{t'} \\
+&= \tilde{E}_{\text{single}}(\omega) \cdot \sum_n e^{-i\omega n T_R}
+\end{aligned}
+\end{equation}
+
+Poisson 求和：$\sum_n e^{-i\omega n T_R} = \frac{2\pi}{T_R} \sum_m \delta(\omega - m \cdot 2\pi/T_R) = \omega_{\text{rep}} \sum_m \delta(\omega - m \omega_{\text{rep}})$。
+
+考虑 CEO 相位滑移后，每脉冲附加相移 $n \Delta\phi_{\text{CEO}}$，给出式(\ref{eq:comb_frequency})。
+
+\subsection{RF 包络的推导}
+
+对于周期性强度脉冲串 $I_{\text{train}}(t) = \sum_k c_k e^{i 2\pi k \frep t}$，其中：
+
+\begin{equation}
+c_k = \frac{1}{T_R} \int_{-T_R/2}^{T_R/2} I_{\text{train}}(t) e^{-i 2\pi k \frep t} \dd{t}
+\end{equation}
+
+由于 $I_{\text{train}}(t) = \sum_n I_{\text{single}}(t - nT_R)$ 在 $[-T_R/2, T_R/2]$ 内仅包含 $n=0$ 项（假设脉冲宽度 $\ll T_R$）：
+
+\begin{equation}
+c_k = \frep \int_{-\infty}^{\infty} I_{\text{single}}(t) e^{-i 2\pi k \frep t} \dd{t} = \frep \cdot \FT[I_{\text{single}}](k\frep)
+\end{equation}
+
+RF 功率谱：$P_k = |c_k|^2 = \frep^2 \cdot |\FT[I_{\text{single}}](k\frep)|^2$。
+
+\end{document}
