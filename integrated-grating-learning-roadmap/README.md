@@ -2,10 +2,15 @@
 
 本学习包面向已经掌握 Maxwell 方程、波导模式和有效折射率法的学习者，从集成波导光栅出发，依次学习均匀布拉格光栅、切趾与啁啾光栅、多模/偏振耦合光栅，以及集成垂直光栅耦合器。
 
-> **2025年7月更新**：新增四份增强文档，深化教材引用、CBG-SiN综述映射、垂直光栅耦合器的严格理论计算和补充文献索引。
+> **2025年7月更新**：新增五份增强文档，深化教材引用、CBG-SiN综述映射、垂直光栅耦合器的严格理论计算、补充文献索引和统一导航。
+
+## 快速导航
+
+📑 **[docs/INDEX.md](docs/INDEX.md)** — 统一文档地图：按场景导航、按专题深入、交叉引用完整性检查。**建议首先阅读。**
 
 ## 使用顺序
 
+0. **首先阅读** [`docs/INDEX.md`](docs/INDEX.md) 了解完整文档地图和所有文档的依赖关系。
 1. 阅读 [`docs/30_day_schedule.md`](docs/30_day_schedule.md)，按天执行任务。
 2. 开始计算前阅读 [`docs/conventions.md`](docs/conventions.md)，统一时间因子、传播方向、功率和损耗定义。
 3. 每一阶段先阅读 [`docs/theory_notes.md`](docs/theory_notes.md) 的对应章节，再运行 `examples/` 中的脚本。
@@ -30,6 +35,7 @@ integrated_grating_30day/
 ├─ README.md
 ├─ setup.m
 ├─ docs/
+│  ├─ INDEX.md                         ← [NEW] 统一导航与文档地图
 │  ├─ 30_day_schedule.md              ← 主日程（含MATLAB）
 │  ├─ 30_day_schedule_theory_only.md   ← 纯理论版日程
 │  ├─ conventions.md                   ← 数学与物理约定
