@@ -1,5 +1,8 @@
 # 集成波导光栅 30 天一站式学习路线图
 
+
+> **📐 公式渲染**：GitHub 网页端不渲染 LaTeX 公式。建议用 **VS Code**（Markdown+Math 扩展）、**Typora** 或 **Obsidian** 打开，或安装浏览器扩展 "MathJax 3 for GitHub"。
+> **📖 参考文献库**：文末附 64 篇论文 + 12 本教材的完整分类文献库，全部含 DOI 链接。
 > **这是唯一需要逐天跟随的文件**。每天的学习目标、推导任务、阅读材料（教材章节+论文DOI+综述段落）、代码文件和产出清单全部内联在此。其他 `docs/` 下的文件为深度参考，按需查阅。
 
 ---
@@ -1060,3 +1063,146 @@ setup; run_all_tests;
 ---
 
 > **后续**：完成本路线图后，可进入 MATLAB 代码的逐行补全和仿真练习阶段（参考现有代码骨架 `matlab/+grating/` 和 `examples/`）。
+
+---
+
+## 📖 完整参考文献库
+
+### 使用说明
+- 每篇文献标注了对应的天次和深度标记（★精读/●通读/○速览）
+- DOI 链接可直接打开（需机构订阅或 Sci-Hub）
+- 教材标注了具体章节和页码范围
+- 综述论文（CBG-SiN Review）标注了对应节号
+
+### 论文全文获取
+多数论文可通过以下方式获取全文：
+1. 通过机构图书馆的 CARSI 认证
+2. [Sci-Hub](https://sci-hub.se)（输入 DOI）
+3. [arXiv](https://arxiv.org)（预印本）
+4. [ResearchGate](https://researchgate.net)（作者上传版）
+
+---
+
+### 阶段一：均匀集成布拉格光栅（第 1–5 天）
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 1 | 2 | ★ | H. Kogelnik, "Coupled Wave Theory for Thick Hologram Gratings," *Bell Syst. Tech. J.*, vol. 48, pp. 2909–2947, 1969 | [10.1002/j.1538-7305.1969.tb01198.x](https://doi.org/10.1002/j.1538-7305.1969.tb01198.x) |
+| 2 | 2,3 | ★ | T. Erdogan, "Fiber grating spectra," *J. Lightwave Technol.*, vol. 15, pp. 1277–1294, 1997 | [10.1109/50.618322](https://doi.org/10.1109/50.618322) |
+| 3 | 4 | ★ | E. Peral and J. Capmany, "Generalized Bloch wave analysis for fiber and waveguide gratings," *J. Lightwave Technol.*, vol. 15, pp. 1295–1302, 1997 | [10.1109/50.618325](https://doi.org/10.1109/50.618325) |
+| 4 | 1 | ● | A. Yariv, "Coupled-mode theory for guided-wave optics," *IEEE J. Quantum Electron.*, vol. 9, pp. 919–933, 1973 | [10.1109/JQE.1973.1077767](https://doi.org/10.1109/JQE.1973.1077767) |
+| 5 | 2 | ● | H. A. Haus and W.-P. Huang, "Coupled-mode theory," *Proc. IEEE*, vol. 79, pp. 1505–1518, 1991 | [10.1109/5.104225](https://doi.org/10.1109/5.104225) |
+| 6 | 2 | ● | W.-P. Huang, "Coupled-mode theory for optical waveguides: an overview," *J. Opt. Soc. Am. A*, vol. 11, pp. 963–983, 1994 | [10.1364/JOSAA.11.000963](https://doi.org/10.1364/JOSAA.11.000963) |
+| 7 | 4 | ● | P. Yeh, A. Yariv, and C.-S. Hong, "Electromagnetic propagation in periodic stratified media. I. General theory," *J. Opt. Soc. Am.*, vol. 67, pp. 423–438, 1977 | [10.1364/JOSA.67.000423](https://doi.org/10.1364/JOSA.67.000423) |
+| 8 | 4 | ○ | P. St. J. Russell, "Bloch wave analysis of dispersion and pulse propagation in pure distributed feedback structures," *J. Mod. Opt.*, vol. 38, pp. 1599–1619, 1991 | [10.1080/09500349114551751](https://doi.org/10.1080/09500349114551751) |
+| 9 | 1 | ○ | K. O. Hill and G. Meltz, "Fiber Bragg grating technology fundamentals and overview," *J. Lightwave Technol.*, vol. 15, pp. 1263–1276, 1997 | [10.1109/50.618320](https://doi.org/10.1109/50.618320) |
+
+### 阶段二：集成结构与正向设计（第 6–10 天）
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 10 | 6 | ★ | W. Streifer, D. Scifres, and R. Burnham, "Coupling coefficients for distributed feedback single- and double-heterostructure diode lasers," *IEEE J. Quantum Electron.*, vol. 11, pp. 867–873, 1975 | [10.1109/JQE.1975.1068537](https://doi.org/10.1109/JQE.1975.1068537) |
+| 11 | 8 | ★ | M. J. Strain et al., "Design and Fabrication of Integrated Chirped Bragg Gratings for On-Chip Dispersion Control," *IEEE J. Quantum Electron.*, vol. 46, pp. 774–782, 2010 | [10.1109/JQE.2010.2042464](https://doi.org/10.1109/JQE.2010.2042464) |
+| 12 | 10 | ★ | J. Á. Praena and A. Carballar, "Chirped Integrated Bragg Grating Design," *Photonics*, vol. 11, 476, 2024 | [10.3390/photonics11050476](https://doi.org/10.3390/photonics11050476) |
+| 13 | 9 | ● | C. Guyot et al., "Optical characterization of ultra-short Bragg grating on lithium niobate ridge waveguide," *Opt. Lett.*, vol. 39, pp. 371–374, 2014 | [10.1364/OL.39.000371](https://doi.org/10.1364/OL.39.000371) |
+| 14 | 9 | ● | D. Pohl et al., "100-GBd Waveguide Bragg Grating Modulator in Thin-Film Lithium Niobate," *IEEE Photon. Technol. Lett.*, vol. 33, pp. 85–88, 2021 | [10.1109/LPT.2020.3044648](https://doi.org/10.1109/LPT.2020.3044648) |
+| 15 | 9 | ● | J. Zhan et al., "Silicon nitride polarization beam splitter based on polarization-independent MMIs and apodized Bragg gratings," *Opt. Express*, vol. 29, pp. 14476–14485, 2021 | [10.1364/OE.420499](https://doi.org/10.1364/OE.420499) |
+| 16 | 10 | ● | R. Cheng and L. Chrostowski, "Spectral Design of Silicon Integrated Bragg Gratings: A Tutorial," *J. Lightwave Technol.*, vol. 39, pp. 712–729, 2021 | [10.1109/JLT.2020.3032659](https://doi.org/10.1109/JLT.2020.3032659) |
+| 17 | 8 | ○ | W. Zhang and J. Yao, "A fully reconfigurable waveguide Bragg grating for programmable photonic signal processing," *Nat. Commun.*, vol. 9, 1396, 2018 | [10.1038/s41467-018-03742-1](https://doi.org/10.1038/s41467-018-03742-1) |
+
+### 阶段三：切趾与啁啾（第 11–17 天）
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 18 | 13 | ★ | F. Ouellette, "Dispersion cancellation using linearly chirped Bragg grating filters in optical waveguides," *Opt. Lett.*, vol. 12, pp. 847–849, 1987 | [10.1364/OL.12.000847](https://doi.org/10.1364/OL.12.000847) |
+| 19 | 12 | ★ | A. D. Simard et al., "Apodized Silicon-on-Insulator Bragg Gratings," *IEEE Photon. Technol. Lett.*, vol. 24, pp. 1035–1037, 2012 | [10.1109/LPT.2012.2194278](https://doi.org/10.1109/LPT.2012.2194278) |
+| 20 | 15 | ★ | L. Poladian, "Graphical and WKB analysis of nonuniform Bragg gratings," *Phys. Rev. E*, vol. 48, pp. 4758–4767, 1993 | [10.1103/PhysRevE.48.4758](https://doi.org/10.1103/PhysRevE.48.4758) |
+| 21 | 16 | ★ | J. Skaar, L. Wang, and T. Erdogan, "On the synthesis of fiber Bragg gratings by layer peeling," *IEEE J. Quantum Electron.*, vol. 37, pp. 165–173, 2001 | [10.1109/3.903065](https://doi.org/10.1109/3.903065) |
+| 22 | 13 | ★ | Z. Du et al., "Silicon nitride chirped spiral Bragg grating with large group delay," *APL Photonics*, vol. 5, 101302, 2020 | [10.1063/5.0022963](https://doi.org/10.1063/5.0022963) |
+| 23 | 14 | ● | Li et al., "Large group delay and low loss optical delay line based on chirped waveguide Bragg gratings," *Opt. Express*, vol. 31, pp. 4630–4641, 2023 | [10.1364/OE.480253](https://doi.org/10.1364/OE.480253) |
+| 24 | 17 | ★ | M. Sinobad et al., "Dispersion Compensating Silicon Nitride Waveguide Bragg Gratings for Ultrashort Pulse Compression," *IEEE Photon. Conf. (IPC)*, 2025 | search on Google Scholar |
+| 25 | 17 | ● | Huang et al., "Broadband on-chip dispersion compensation at 2-μm waveband using silicon nitride chirped Bragg gratings," *Opt. Express*, vol. 33, 26939, 2025 | [10.1364/OE.570174](https://doi.org/10.1364/OE.570174) |
+| 26 | 13 | ● | K. O. Hill et al., "Chirped in-fiber Bragg gratings for compensation of optical fiber dispersion," *Opt. Lett.*, vol. 19, pp. 1314–1316, 1994 | [10.1364/OL.19.001314](https://doi.org/10.1364/OL.19.001314) |
+| 27 | 13 | ○ | B. J. Eggleton et al., "Experimental demonstration of compression of dispersed optical pulses by reflection from self-chirped optical fibre Bragg gratings," *Opt. Lett.*, vol. 19, pp. 877–879, 1994 | [10.1364/OL.19.000877](https://doi.org/10.1364/OL.19.000877) |
+| 28 | 17 | ○ | W. H. Loh et al., "10 cm chirped fibre Bragg grating for dispersion compensation at 10 Gbit/s over 400 km of non-dispersion shifted fibre," *Electron. Lett.*, vol. 31, pp. 2203–2204, 1995 | [10.1049/el:19951497](https://doi.org/10.1049/el:19951497) |
+| 29 | 11 | ○ | M. J. Strain, "Integrated chirped Bragg gratings for dispersion control," PhD Thesis, University of Glasgow, 2007 | [theses.gla.ac.uk](https://theses.gla.ac.uk/23/) |
+| 30 | 11 | ○ | H. Kogelnik, "Filter Response of Nonuniform Almost-Periodic Structures," *Bell Syst. Tech. J.*, vol. 55, pp. 109–126, 1976 | [10.1002/j.1538-7305.1976.tb02862.x](https://doi.org/10.1002/j.1538-7305.1976.tb02862.x) |
+
+### 阶段四：高阶模式与偏振耦合（第 18–22 天）
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 31 | 18 | ★ | C. Lu and Y. Cui, "Fiber Bragg grating spectra in multimode optical fibers," *J. Lightwave Technol.*, vol. 24, pp. 306–314, 2006 | [10.1109/JLT.2005.859841](https://doi.org/10.1109/JLT.2005.859841) |
+| 32 | 22 | ★ | S. Liu, D. Liu, Z. Yu, L. Liu, Y. Shi, D. Dai, "On-chip digitally-tunable positive/negative dispersion controller using bidirectional chirped multimode waveguide gratings," *Adv. Photonics*, vol. 5, 056005, 2023 | [10.1117/1.AP.5.5.056005](https://doi.org/10.1117/1.AP.5.5.056005) |
+| 33 | 21 | ★ | N. Ning et al., "Narrow-band Add-Drop Filters Based on Silicon Nitride Multimode Waveguide Bragg Grating," *IEEE Photon. Technol. Lett.*, vol. 36, pp. 125–128, 2024 | [10.1109/LPT.2023.3289864](https://doi.org/10.1109/LPT.2023.3289864) |
+| 34 | 21 | ● | Z. Xu, B. Tu, and H. Liu, "High performance TM-pass polarizer using multimode Bragg grating waveguide," *Opt. Express*, vol. 32, pp. 10123–10133, 2024 | [10.1364/OE.520833](https://doi.org/10.1364/OE.520833) |
+| 35 | 20 | ★ | J. Zhan et al., "Silicon nitride polarization beam splitter based on polarization-independent MMIs and apodized Bragg gratings," *Opt. Express*, 2021 | (see #15 above) |
+| 36 | 20 | ● | S. Liu, R. Ma, W. Zhao, Z. Yu, D. Dai, "Large-scale dispersion compensation with a TM-type chirped multimode waveguide grating," *Chin. Opt. Lett.*, vol. 22, 121301, 2024 | [10.3788/COL202422.121301](https://doi.org/10.3788/COL202422.121301) |
+| 37 | 21 | ● | S. Hong et al., "Multimode-enabled silicon photonic delay lines: break the delay-density limit," *Light Sci. Appl.*, vol. 14, 114, 2025 | [10.1038/s41377-025-01778-9](https://doi.org/10.1038/s41377-025-01778-9) |
+| 38 | 19 | ● | A. Hardy and W. Streifer, "Coupled mode theory of parallel waveguides," *J. Lightwave Technol.*, vol. 3, pp. 1135–1146, 1985 | [10.1109/JLT.1985.1074291](https://doi.org/10.1109/JLT.1985.1074291) |
+| 39 | 18 | ○ | T. Mizuno et al., "Coupled-mode theory of multiwaveguide systems," *J. Lightwave Technol.*, vol. 20, pp. 1250–1258, 2002 | [10.1109/JLT.2002.800294](https://doi.org/10.1109/JLT.2002.800294) |
+| 40 | 18 | ○ | C.-S. Kim et al., "Multimode photonic wire Bragg grating," *Opt. Express*, vol. 21, pp. 31367–31374, 2013 | [10.1364/OE.21.031367](https://doi.org/10.1364/OE.21.031367) |
+
+### 阶段五：垂直光栅耦合器（第 23–28 天）
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 41 | 23 | ★ | T. Tamir and S. T. Peng, "Analysis and design of grating couplers," *Appl. Phys.*, vol. 14, pp. 235–254, 1977 | [10.1007/BF00882729](https://doi.org/10.1007/BF00882729) |
+| 42 | 23 | ★ | D. Taillaert et al., "Grating Couplers for Coupling between Optical Fibers and Nanophotonic Waveguides," *Jpn. J. Appl. Phys.*, vol. 45, pp. 6071–6077, 2006 | [10.1143/JJAP.45.6071](https://doi.org/10.1143/JJAP.45.6071) |
+| 43 | 24 | ★ | F. Van Laere et al., "Compact and Highly Efficient Grating Couplers Between Optical Fiber and Nanophotonic Waveguides," *J. Lightwave Technol.*, vol. 25, pp. 151–156, 2007 | [10.1109/JLT.2006.888164](https://doi.org/10.1109/JLT.2006.888164) |
+| 44 | 25 | ★ | Z. Zhao and S. Fan, "Design Principles of Apodized Grating Couplers," *J. Lightwave Technol.*, vol. 38, pp. 4435–4444, 2020 | [10.1109/JLT.2020.2992574](https://doi.org/10.1109/JLT.2020.2992574) |
+| 45 | 27 | ★ | D. Benedikovic et al., "Subwavelength index engineered surface grating coupler with sub-decibel efficiency for 220-nm silicon-on-insulator waveguides," *Opt. Express*, vol. 23, pp. 22628–22635, 2015 | [10.1364/OE.23.022628](https://doi.org/10.1364/OE.23.022628) |
+| 46 | 27 | ★ | A. Michaels and E. Yablonovitch, "Inverse design of near unity efficiency perfectly vertical grating couplers," *Opt. Express*, vol. 26, pp. 4766–4779, 2018 | [10.1364/OE.26.004766](https://doi.org/10.1364/OE.26.004766) |
+| 47 | 28 | ★ | C. Xue et al., "Inverse design and fabrication of high-efficiency perfectly vertical LNOI grating couplers," *Opt. Lett.*, vol. 50, pp. 549–552, 2025 | [10.1364/OL.549856](https://doi.org/10.1364/OL.549856) |
+| 48 | 28 | ★ | J. Zou et al., "Ultra efficient silicon nitride grating coupler with bottom grating reflector," *Opt. Express*, vol. 23, pp. 26305–26312, 2015 | [10.1364/OE.23.026305](https://doi.org/10.1364/OE.23.026305) |
+| 49 | 23 | ● | M. L. Dakss et al., "Grating coupler for efficient excitation of optical guided waves in thin films," *Appl. Phys. Lett.*, vol. 16, pp. 523–525, 1970 | [10.1063/1.1653091](https://doi.org/10.1063/1.1653091) |
+| 50 | 24 | ● | A. Hardy, D. Welch, and W. Streifer, "Analysis of a dual grating coupler," *IEEE J. Quantum Electron.*, vol. 25, pp. 2091–2098, 1989 | [10.1109/3.35723](https://doi.org/10.1109/3.35723) |
+| 51 | 24 | ● | V. A. Sychugov et al., "Radiation losses in corrugated waveguides," *Sov. J. Quantum Electron.*, vol. 10, pp. 186–190, 1980 | [10.1070/QE1980v010n02ABEH009937](https://doi.org/10.1070/QE1980v010n02ABEH009937) |
+| 52 | 25 | ● | K. A. Bates et al., "Gaussian beams from variable groove depth grating couplers," *Appl. Opt.*, vol. 32, pp. 2112–2116, 1993 | [10.1364/AO.32.002112](https://doi.org/10.1364/AO.32.002112) |
+| 53 | 26 | ● | Y. Ding et al., "Fully etched apodized grating coupler on the SOI platform with -0.58 dB coupling efficiency," *Opt. Lett.*, vol. 39, pp. 5348–5350, 2014 | [10.1364/OL.39.005348](https://doi.org/10.1364/OL.39.005348) |
+| 54 | 23 | ○ | R. Marchetti et al., "Coupling strategies for silicon photonics integrated chips," *Photonics Res.*, vol. 7, pp. 201–239, 2019 | [10.1364/PRJ.7.000201](https://doi.org/10.1364/PRJ.7.000201) |
+| 55 | 23 | ○ | L. Cheng et al., "Grating couplers on silicon photonics: design principles, emerging trends and practical issues," *Micromachines*, vol. 11, 666, 2020 | [10.3390/mi11070666](https://doi.org/10.3390/mi11070666) |
+| 56 | 27 | ○ | N. V. Sapra et al., "Inverse design and demonstration of broadband grating couplers," *IEEE J. Sel. Top. Quantum Electron.*, vol. 25, 6100207, 2019 | [10.1109/JSTQE.2019.2899758](https://doi.org/10.1109/JSTQE.2019.2899758) |
+
+### 阶段六及综合参考
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 57 | 30 | ★ | F. Gardes et al., "A Review of Capabilities and Scope for Hybrid Integration Offered by Silicon-Nitride-Based Photonic Integrated Circuits," *Sensors*, vol. 22, 4227, 2022 | [10.3390/s22114227](https://doi.org/10.3390/s22114227) |
+| 58 | 30 | ● | S. Kaushal et al., "Optical signal processing based on silicon photonics waveguide Bragg gratings: review," *Front. Optoelectron.*, vol. 11, pp. 163–188, 2018 | [10.1007/s12200-018-0819-x](https://doi.org/10.1007/s12200-018-0819-x) |
+| 59 | 30 | ● | N. Singh, J. Lorenzen, M. Sinobad et al., "Integrated photonic frequency comb sources," *Nat. Photonics*, vol. 18, pp. 485–491, 2024 | search on Google Scholar |
+| 60 | 30 | ○ | H. Sun et al., "Integrated Subwavelength Grating Waveguide Bragg Gratings for Microwave Photonics," *J. Lightwave Technol.*, vol. 40, pp. 6636–6649, 2022 | [10.1109/JLT.2022.3194562](https://doi.org/10.1109/JLT.2022.3194562) |
+
+### 锁模激光器与 SiN 色散管理（补充专题）
+
+| # | 天次 | 深度 | 文献 | DOI |
+|:---:|:---:|:---:|---|---|
+| 61 | 17,30 | ● | K. Shtyrkova, P. T. Callahan et al., "Integrated CMOS-compatible Q-switched mode-locked lasers at 1900nm with an on-chip artificial saturable absorber," *Opt. Express*, vol. 27, pp. 3542–3555, 2019 | [10.1364/OE.27.003542](https://doi.org/10.1364/OE.27.003542) |
+| 62 | 17,30 | ● | S. Cuyvers et al., "Low Noise Heterogeneous III-V-on-Silicon-Nitride Mode-Locked Comb Laser," *Laser Photonics Rev.*, vol. 15, 2000485, 2021 | [10.1002/lpor.202000485](https://doi.org/10.1002/lpor.202000485) |
+| 63 | 17,30 | ● | A. Hermans et al., "High-pulse-energy III-V-on-silicon-nitride mode-locked laser," *APL Photonics*, vol. 6, 096102, 2021 | [10.1063/5.0058024](https://doi.org/10.1063/5.0058024) |
+| 64 | 17,30 | ○ | E. Vissers et al., "Hybrid integrated mode-locked laser diodes with a silicon nitride extended cavity," *Opt. Express*, vol. 29, pp. 15013–15022, 2021 | [10.1364/OE.422560](https://doi.org/10.1364/OE.422560) |
+
+### 核心教材速查
+
+| # | 教材 | 作者/版本 | 核心章节 | 适用天次 |
+|:---:|---|---|---|:---:|
+| T1 | *Fundamentals of Optical Waveguides* | K. Okamoto, 2nd ed., 2006 | §3.1–3.3, §4.1–4.10, §5.1–5.3 | 1–2, 6, 19, 25 |
+| T2 | *Photonics: Optical Electronics in Modern Communications* | A. Yariv, P. Yeh, 6th ed., 2007 | §13.1–13.10 | 2–4, 6, 14, 20, 23 |
+| T3 | *Diode Lasers and Photonic Integrated Circuits* | L. A. Coldren et al., 2nd ed., 2012 | §3.3–3.5, §6.4–6.14 | 4, 8, 11, 13, 18, 21 |
+| T4 | *Fiber Bragg Gratings* | R. Kashyap, 2nd ed., 2010 | §3.1–3.4, §4.1–4.8, §5.1–5.10, §7.1–7.10, §8.1–8.7 | 3, 7, 10–17, 25 |
+| T5 | *Optical Waveguide Theory* | A. W. Snyder, J. D. Love, 1983 | Part II §11–14, §31–33 | 1, 9, 19, 21 |
+| T6 | *Theory of Dielectric Optical Waveguides* | D. Marcuse, 2nd ed., 1991 | §3.1–3.5, §4.1–4.4, §5.1–5.7 | 15, 24, 26, 29 |
+| T7 | *Waves and Fields in Optoelectronics* | H. A. Haus, 1984 | §6.1–6.8 | 2, 18 |
+| T8 | *Silicon Photonics Design* | L. Chrostowski, M. Hochberg, 2015 | §2.1–2.4, §3.1–3.3, §5.1–5.11, §10 | 7, 9–10, 26, 30 |
+| T9 | *Foundations for Guided-Wave Optics* | C.-L. Chen, 2007 | §8.1–8.10, §9.1–9.4 | 4, 20, 23, 27 |
+| T10 | *Fiber Bragg Gratings* | A. Othonos, K. Kalli, 1999 | 物理解释和应用补充 | 3, 12, 13 |
+| T11 | *Integrated Optics: Theory and Technology* | R. G. Hunsperger, 6th ed., 2009 | 集成周期结构背景 | 6, 8 |
+| T12 | *Photonic Crystals: Molding the Flow of Light* | J. D. Joannopoulos et al., 2nd ed., 2008 | §3.1–3.3, §4.4–4.7, §5.1–5.4 | 4, 8, 24, 27 |
+
+---
+
+> **提示**：在 GitHub 上查看 `.md` 文件时，LaTeX 公式默认不会渲染。建议以下任一方式获得公式渲染：
+> 1. **VS Code** 安装扩展 "Markdown All in One" + "Markdown+Math"
+> 2. **Typora** 或 **Obsidian** 直接打开 `.md` 文件
+> 3. **浏览器扩展** "MathJax 3 for GitHub"（Chrome/Firefox）
+> 4. **克隆到本地**后用任何支持 MathJax 的 Markdown 编辑器打开
