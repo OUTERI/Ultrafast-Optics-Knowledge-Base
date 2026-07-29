@@ -12,15 +12,15 @@
 
 未扰动波导（无光栅）支持一组离散的导模和连续的辐射模。导模的传播常数 $\beta_m$ 满足
 
-\[
+$$
 k_0 n_{\text{clad}} < |\beta_m| < k_0 n_{\text{core}}
-\]
+$$
 
 辐射模的传播常数连续分布在
 
-\[
+$$
 |\beta| < k_0 n_{\text{clad}}
-\]
+$$
 
 引入周期光栅后，导模通过 Floquet 空间谐波与辐射连续谱耦合，能量从波导向自由空间泄漏。
 
@@ -28,17 +28,17 @@ k_0 n_{\text{clad}} < |\beta_m| < k_0 n_{\text{core}}
 
 严格的处理方式是将光栅单元视为沿 $z$ 方向的周期结构，求解泄漏模（leaky mode）的复传播常数：
 
-\[
+$$
 \tilde{\beta} = \beta - i\alpha
-\]
+$$
 
 其中实部 $\beta$ 决定相位匹配和辐射角，虚部 $\alpha$（功率衰减系数的一半，$dP/dz = -2\alpha P$）决定辐射率。
 
 泄漏模满足准周期边界条件（Floquet 定理）：
 
-\[
+$$
 \mathbf{E}(x, y, z+\Lambda) = \mathbf{E}(x, y, z)\, e^{i\tilde{\beta}\Lambda}
-\]
+$$
 
 **关键点**：泄漏模的复传播常数 $\tilde{\beta}$ 是光栅几何的全波解，不能简单用未刻蚀直波导的 $n_{\text{eff}}$ 替代。这是 `theory_notes.md` §8 中强调"周期单元是泄漏 Bloch 模"的数学原因。
 
@@ -58,10 +58,10 @@ k_0 n_{\text{clad}} < |\beta_m| < k_0 n_{\text{core}}
 
 未扰动波导的辐射模构成连续谱的正交基：
 
-\[
+$$
 \int_{A_\infty} \left[ \mathbf{e}_{\nu}(\beta) \times \mathbf{h}_{\mu}^*(\beta') \right] \cdot \hat{z} \, dA
 = P_\mu(\beta)\,\delta_{\mu\nu}\,\delta(\beta-\beta')
-\]
+$$
 
 其中 $\mu,\nu$ 标记辐射模的不同偏振分支，$\delta(\beta-\beta')$ 是 Dirac $\delta$ 函数。
 
@@ -71,10 +71,10 @@ k_0 n_{\text{clad}} < |\beta_m| < k_0 n_{\text{core}}
 
 在微扰光栅存在下，总场可展开为导模 + 辐射连续谱：
 
-\[
+$$
 \mathbf{E}(x,y,z) = \sum_m A_m(z)\mathbf{e}_m(x,y)e^{i\beta_m z}
 + \sum_\nu \int A_\nu(z,\beta)\mathbf{e}_\nu(x,y;\beta)e^{i\beta z} d\beta
-\]
+$$
 
 辐射模的积分（而非求和）使得直接的数值处理非常困难，通常需要：
 - **离散化**：将连续谱用泄漏模或 PML 离散模替代
@@ -86,23 +86,23 @@ k_0 n_{\text{clad}} < |\beta_m| < k_0 n_{\text{core}}
 
 光栅区域的介电扰动 $\Delta\epsilon(x,y,z)$ 在导模的电场 $\mathbf{E}_g$ 存在下产生极化电流：
 
-\[
+$$
 \mathbf{J}_{\text{pol}}(x,y,z) = -i\omega\epsilon_0\Delta\epsilon(x,y,z)\,\mathbf{E}_g(x,y,z)
-\]
+$$
 
 对于周期为 $\Lambda$ 的光栅，将 $\Delta\epsilon$ 展开为 Fourier 级数：
 
-\[
+$$
 \Delta\epsilon(x,y,z) = \sum_{q=-\infty}^{\infty} \Delta\epsilon_q(x,y) e^{iqKz}, \quad K = \frac{2\pi}{\Lambda}
-\]
+$$
 
 #### A.3.2 辐射场的 Green 函数表示
 
 分层介质（波导芯/包层/衬底/埋氧层）的并矢 Green 函数 $\overleftrightarrow{G}(\mathbf{r},\mathbf{r}')$ 给出位于 $\mathbf{r}'$ 的单位偶极子在 $\mathbf{r}$ 处产生的电场：
 
-\[
+$$
 \mathbf{E}_{\text{rad}}(\mathbf{r}) = i\omega\mu_0 \int_{V_{\text{grating}}} \overleftrightarrow{G}(\mathbf{r},\mathbf{r}') \cdot \mathbf{J}_{\text{pol}}(\mathbf{r}')\, d^3r'
-\]
+$$
 
 在远场（$r \to \infty$），Green 函数通过稳相法（stationary phase method）退化为球面波（三维）或柱面波（二维）。
 
@@ -110,18 +110,18 @@ k_0 n_{\text{clad}} < |\beta_m| < k_0 n_{\text{core}}
 
 将远场辐射功率分解为立体角 $(\theta,\phi)$ 的函数：
 
-\[
+$$
 \frac{dP_{\text{rad}}}{d\Omega} = \frac{\omega^2\mu_0^2}{8\pi^2 c}
 \left| \hat{\mathbf{p}} \cdot \int_{V_{\text{grating}}} \mathbf{J}_{\text{pol}}(\mathbf{r}')\, e^{-i\mathbf{k}_{\text{rad}}\cdot\mathbf{r}'}\, d^3r' \right|^2
-\]
+$$
 
 其中 $\mathbf{k}_{\text{rad}}$ 是辐射方向的波矢，$\hat{\mathbf{p}}$ 是远场偏振方向。
 
 对于一维周期光栅（光沿 $z$ 方向传播、光栅周期在 $z$ 方向），辐射角 $\theta$（相对于表面法线）由 Floquet 条件决定：
 
-\[
+$$
 k_0 n_c \sin\theta = \beta - qK
-\]
+$$
 
 **这正是 `theory_notes.md` §8 中的相位匹配条件**，但现在有了严格的电磁学基础：
 - $q$ = 衍射级次（$q = \pm1, \pm2, \ldots$）
@@ -132,17 +132,17 @@ k_0 n_c \sin\theta = \beta - qK
 
 局域功率泄漏率 $\alpha(z)$ 可以从辐射场的 Green 函数积分获得。对于弱耦合光栅：
 
-\[
+$$
 \alpha(z) = \frac{1}{2P_g} \frac{dP_{\text{rad}}}{dz}
-\]
+$$
 
 其中 $P_g$ 是导模功率。代入 Green 函数表示：
 
-\[
+$$
 \alpha(z) = \frac{\omega^2\mu_0}{4\pi c P_g} \sum_{q\in\text{radiating}} \int_{-\pi/2}^{\pi/2}
 \left| \iint_{A} \Delta\epsilon_q(x,y)\,\mathbf{e}_g(x,y)\cdot\mathbf{e}_{\text{rad},q}(x,y;\theta)\,dA \right|^2
 \frac{n_c\cos^2\theta}{\cos\theta_g}\, d\theta
-\]
+$$
 
 其中：
 - $\mathbf{e}_{\text{rad},q}$ 是第 $q$ 阶辐射模的横向场分布（由分层介质的 Green 函数或传输矩阵给出）
@@ -159,39 +159,39 @@ k_0 n_c \sin\theta = \beta - qK
 
 将多层结构沿 $y$（垂直于芯片表面的方向）离散，每层用 $2\times 2$ 传输矩阵表示：
 
-\[
+$$
 \begin{bmatrix} E_y^+ \\ E_y^- \end{bmatrix}_{y=y_{i+1}} =
 \begin{bmatrix}
 e^{-ik_{y,i}d_i} & 0 \\
 0 & e^{+ik_{y,i}d_i}
 \end{bmatrix}
 \begin{bmatrix} E_y^+ \\ E_y^- \end{bmatrix}_{y=y_i}
-\]
+$$
 
 对于 TE 偏振，界面处的 Fresnel 系数为：
 
-\[
+$$
 r_{i,i+1}^{\text{TE}} = \frac{k_{y,i} - k_{y,i+1}}{k_{y,i} + k_{y,i+1}}, \quad
 t_{i,i+1}^{\text{TE}} = \frac{2k_{y,i}}{k_{y,i} + k_{y,i+1}}
-\]
+$$
 
 多层结构的总反射和透射给出**向上功率分数** $D_{\text{up}}$ 和**向下功率分数** $D_{\text{down}}$：
 
-\[
+$$
 D_{\text{up}} = \frac{P_{\text{up}}}{P_{\text{up}} + P_{\text{down}}}, \quad
 D_{\text{up}} + D_{\text{down}} = 1
-\]
+$$
 
 #### A.4.2 BOX 厚度干涉
 
 埋氧层（BOX）厚度 $h_{\text{BOX}}$ 是方向性设计的核心参数。从光栅辐射到衬底的向下波在 BOX/衬底界面部分反射，与直接向上辐射的波发生干涉：
 
-\[
+$$
 D_{\text{up}}(\lambda, h_{\text{BOX}}) =
 \frac{1 + |r_{\text{BOX}}|^2 + 2|r_{\text{BOX}}|\cos(2k_{y,\text{BOX}}h_{\text{BOX}} + \phi_r)}
 {1 + |r_{\text{BOX}}|^2}
 \times D_{\text{up}}^{(0)}
-\]
+$$
 
 其中 $D_{\text{up}}^{(0)}$ 是无 BOX 反射时的方向性，$r_{\text{BOX}}$ 是 BOX/衬底界面的复反射系数。方向性随 $h_{\text{BOX}}$ 呈周期性振荡，周期为 $\lambda/(2n_{\text{BOX}}\cos\theta_{\text{BOX}})$。
 
@@ -221,27 +221,27 @@ D_{\text{up}}(\lambda, h_{\text{BOX}}) =
 
 功率衰减方程为：
 
-\[
+$$
 \frac{dP}{dz} = -2\alpha(z)P(z)
-\]
+$$
 
 期望的辐射功率密度为：
 
-\[
+$$
 -\frac{dP_{\text{rad}}}{dz} = \eta_e P(0) p_t(z)
-\]
+$$
 
 同时 $dP_{\text{rad}}/dz = dP/dz$（从导模泄漏的功率全部转化为辐射），因此：
 
-\[
+$$
 \eta_e P(0) p_t(z) = - \frac{dP}{dz} = 2\alpha(z)P(z)
-\]
+$$
 
 由 $P(z) = P(0) - \eta_e P(0) \int_0^z p_t(s)ds = P(0)[1 - \eta_e\int_0^z p_t(s)ds]$，得到 **$\alpha(z)$ 反演公式**：
 
-\[
+$$
 \boxed{\alpha(z) = \frac{\eta_e\, p_t(z)}{2\left[1 - \eta_e\int_0^z p_t(s)ds\right]}}
-\]
+$$
 
 这就是 `theory_notes.md` §8.1 中公式的完整推导。
 
@@ -257,15 +257,15 @@ D_{\text{up}}(\lambda, h_{\text{BOX}}) =
 
 单模光纤（如 SMF-28）的基模可用高斯函数高度精确地近似：
 
-\[
+$$
 E_{\text{fiber}}(x,y,z) = E_0 \exp\left[-\frac{(x-x_0)^2}{w_x^2} - \frac{(z-z_0)^2}{w_z^2}\right]
-\]
+$$
 
 对于垂直耦合，光纤通常倾斜角 $\theta$ 放置。在光栅出射面坐标系中，将倾斜光纤的高斯场投影到出射平面上：
 
-\[
+$$
 E_{\text{fiber}}(x,z;\theta) = E_0 \exp\left[-\frac{x^2}{w_x^2} - \frac{(z\cos\theta)^2}{w_z^2}\right] e^{i k_0 n_c z\sin\theta}
-\]
+$$
 
 其中最后的相位因子 $e^{i k_0 n_c z\sin\theta}$ 来自光纤的倾斜入射/出射角度——这与光栅的辐射方向必须相位匹配。
 
@@ -273,15 +273,15 @@ E_{\text{fiber}}(x,z;\theta) = E_0 \exp\left[-\frac{x^2}{w_x^2} - \frac{(z\cos\t
 
 辐射场沿 $z$ 的复振幅为（见 §A.3）：
 
-\[
+$$
 E_{\text{rad}}(z) = \sqrt{2\alpha(z)P(z)}\, e^{i\phi_{\text{rad}}(z)}
-\]
+$$
 
 其中相位 $\phi_{\text{rad}}(z)$ 由光栅单元的辐射相位和传播相位共同决定。对于一阶衍射：
 
-\[
+$$
 \phi_{\text{rad}}(z) = \int_0^z [\beta(s) - K(s)]\, ds + \phi_{\text{grating}}(z)
-\]
+$$
 
 $\phi_{\text{grating}}(z)$ 来自光栅单元本身的辐射相位（与占空比、刻蚀深度等有关，需通过 RCWA/FDTD 标定）。
 
@@ -289,10 +289,10 @@ $\phi_{\text{grating}}(z)$ 来自光栅单元本身的辐射相位（与占空�
 
 辐射场与光纤目标场在出射参考面上的复振幅重叠效率为：
 
-\[
+$$
 \eta_{\text{overlap}} = \frac{\left|\int_0^L E_{\text{rad}}(z)\,E_{\text{fiber}}^*(z)\,dz\right|^2}
 {\int_0^L |E_{\text{rad}}(z)|^2\,dz \cdot \int_0^L |E_{\text{fiber}}(z)|^2\,dz}
-\]
+$$
 
 **关键区别**：这是**复振幅**的重叠，而非仅功率密度的重叠。幅度匹配保证功率分布一致；相位匹配保证辐射波前与倾斜光纤的相位面相干叠加。幅度匹配而相位不匹配，重叠效率仍然很低。
 
@@ -310,9 +310,9 @@ $\phi_{\text{grating}}(z)$ 来自光栅单元本身的辐射相位（与占空�
 
 将垂直光栅耦合器的总效率拆解为可独立优化和诊断的子效率：
 
-\[
+$$
 \boxed{\eta_{\text{total}} = \eta_{\text{extract}} \times D_{\text{up}} \times \eta_{\text{overlap}} \times \eta_{\text{transition}}}
-\]
+$$
 
 #### B.3.1 各因子的物理含义和计算来源
 
